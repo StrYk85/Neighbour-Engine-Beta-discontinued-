@@ -1,0 +1,46 @@
+{
+    "folder": "week4",
+    "zoom": 0.9,
+    "objects": [
+        {
+            "name": "limoSunset",
+            "assetPath": "limo/limoSunset",
+            "position": [-120, -50],
+            "scrollFactor": [0.1]
+        },
+        {
+            "name": "bgLimo",
+            "assetPath": "limo/bgLimo",
+            "position": [-200, 480],
+            "scrollFactor": [0.4],
+            "animations": [
+                {
+                    "name": "drive",
+                    "prefix": "background limo pink",
+                    "loop": true
+                }
+            ]
+        },
+        {
+            "name": "limoDrive",
+            "assetPath": "limo/limoDrive",
+            "position": [-120, 550],
+            "animations": [
+                {
+                    "name": "drive",
+                    "prefix": "Limo stage",
+                    "loop": true
+                }
+            ]
+        }
+    ],
+    "bf": {
+        "position": [1300, 230]
+        },
+    "gf": {
+        "position": [400, 130]
+    },
+    "dad": {
+        "position": [100, 100]
+    }
+}

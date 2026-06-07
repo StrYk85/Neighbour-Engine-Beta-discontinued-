@@ -1,0 +1,39 @@
+{
+    "assetPath": "characters/Dad_assets",
+    "cameraOffsets": [150, -100],
+    "playerCameraOffsets": [-150, -100],
+    "playerOffsets": [0, -350],
+    "singTime": 6.1,
+    "iconColor": "0xAF66CE",
+    "animations": [
+        {
+            "name": "idle",
+            "prefix": "Dad idle dance",
+            "indices": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 0, 1],
+            "loopIndices": [10, 11, 12, 12]
+        },
+        {
+            "name": "singLEFT",
+            "prefix": "dad sing note right",
+            "offsets": [-9, 12],
+            "loopIndices": [2, 3, 4, 5]
+        },
+        {
+            "name": "singDOWN",
+            "prefix": "Dad Sing Note DOWN",
+            "offsets": [0, -30]
+        },
+        {
+            "name": "singUP",
+            "prefix": "Dad Sing note UP",
+            "offsets": [-10, 50],
+            "loopIndices": [2, 3, 4, 5]
+        },
+        {
+            "name": "singRIGHT",
+            "prefix": "Dad Sing Note LEFT",
+            "offsets": [0, 27],
+            "loopIndices": [2, 3, 4, 5]
+        }
+    ]
+}

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas imagePath="donald.png">
+	<!-- Created with Adobe Animate version 22.0.5.191 -->
+	<!-- http://www.adobe.com/products/animate.html -->
+	<SubTexture name="drop0000" x="8" y="8" width="290" height="690" frameX="-7" frameY="0" frameWidth="328" frameHeight="1275"/>
+	<SubTexture name="drop0001" x="306" y="8" width="211" height="681" frameX="-58" frameY="-354" frameWidth="328" frameHeight="1275"/>
+	<SubTexture name="drop0002" x="525" y="8" width="266" height="681" frameX="-31" frameY="-594" frameWidth="328" frameHeight="1275"/>
+	<SubTexture name="drop0003" x="799" y="8" width="328" height="681" frameX="0" frameY="-547" frameWidth="328" frameHeight="1275"/>
+	<SubTexture name="drop0004" x="1135" y="8" width="311" height="685" frameX="-8" frameY="-551" frameWidth="328" frameHeight="1275"/>
+	<SubTexture name="drop0005" x="1454" y="8" width="315" height="681" frameX="-6" frameY="-551" frameWidth="328" frameHeight="1275"/>
+</TextureAtlas>
