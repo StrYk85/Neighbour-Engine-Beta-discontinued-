@@ -35,8 +35,6 @@ class AnimationDebug extends MusicBeatState
 		gridBG.scrollFactor.set(0.5, 0.5);
 		add(gridBG);
 
-		Paths.setCurrentLevel('shared'); // doing this so that it actually works
-
 		char = new Character(0, 0, daAnim);
 		char.screenCenter();
 		char.debugMode = true;

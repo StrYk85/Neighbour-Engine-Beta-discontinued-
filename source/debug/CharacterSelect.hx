@@ -30,7 +30,7 @@ class CharacterSelect extends MusicBeatState
 		var charList = CoolUtil.coolTextFile(Paths.txt('characterList'));
 		for (char in charList) characters.push(char);
 
-		var menuBG:FlxSprite = new FlxSprite().loadGraphic(Paths.image("menuDesat"));
+		var menuBG:FlxSprite = new FlxSprite().loadGraphic(Paths.image("mainmenu/menuDesat"));
 
 		menuBG.color = 0xFFea71fd;
 		menuBG.setGraphicSize(Std.int(menuBG.width * 1.1));

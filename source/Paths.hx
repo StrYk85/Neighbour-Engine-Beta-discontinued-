@@ -11,23 +11,9 @@ import openfl.utils.AssetType;
 import openfl.system.System;
 import openfl.utils.Assets as OpenFlAssets;
 
-class Paths
-{
-	static var currentLevel:String;
-
-	static public function setCurrentLevel(name:String) {
-		currentLevel = name.toLowerCase();
-	}
-
-	static function getPath(file:String, type:AssetType, library:Null<String>) {
-		if (library != null)
-			return getLibraryPath(file, library);
-
-		if (currentLevel != null) {
-			var levelPath:String = getLibraryPathForce(file, currentLevel);
-			if (OpenFlAssets.exists(levelPath, type))
-				return levelPath;
-		}
+class Paths {
+	static function getPath(file:String, type:AssetType, ?library:Null<String> = null) {
+		if (library != null) return getLibraryPath(file, library);
 
 		var levelPath:String = getLibraryPathForce(file, 'shared');
 		if (OpenFlAssets.exists(levelPath, type))
@@ -43,8 +29,7 @@ class Paths
 	];
 
 	public static function excludeAsset(key:String) {
-		if (!dumpExclusions.contains(key))
-			dumpExclusions.push(key);
+		if (!dumpExclusions.contains(key)) dumpExclusions.push(key);
 	}
 
 	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];
@@ -160,12 +145,12 @@ class Paths
 
 	inline static public function voices(song:String) {
 		var songLowercase = StringTools.replace(song, " ", "-").toLowerCase();
-		return getPath('${songLowercase}/Voices.${Defaults.SOUND_EXT}', SOUND, 'songs');
+		return getPath('songs/${songLowercase}/Voices.${Defaults.SOUND_EXT}', SOUND);
 	}
 
 	inline static public function inst(song:String) {
 		var songLowercase = StringTools.replace(song, " ", "-").toLowerCase();
-		return getPath('${songLowercase}/Inst.${Defaults.SOUND_EXT}', SOUND, 'songs');
+		return getPath('songs/${songLowercase}/Inst.${Defaults.SOUND_EXT}', SOUND);
 	}
 
 	inline static public function image(key:String, ?library:String) {

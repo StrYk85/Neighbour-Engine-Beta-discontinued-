@@ -99,7 +99,7 @@ class ChartingState extends FlxUIState
 	override function create() {
 		curSection = lastSection;
 
-		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
+		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('mainmenu/menuDesat'));
 		bg.scrollFactor.set();
 		bg.color = 0xFF2C2C2C;
 		add(bg);

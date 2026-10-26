@@ -45,20 +45,16 @@ class Character extends FunkinSprite {
 		var rawJson = Assets.getText(Paths.json('characters/' + curCharacter));
 		var daJson = Json.parse(rawJson);
 
-		frames = Paths.getSparrowAtlas(daJson.assetPath, 'shared');
+		frames = Paths.getSparrowAtlas(daJson.assetPath);
 		var animations:Array<AnimationData> = daJson.animations;
 
 		for (anim in animations) {
 			if (anim.name == 'danceLeft' || anim.name == 'danceRight') shouldAlternate = true;
 
-			if (anim.indices != null)
-				animation.addByIndices(anim.name, anim.prefix, anim.indices, '', anim.framerate ?? 24, anim.loop ?? false);
-			else
-				animation.addByPrefix(anim.name, anim.prefix, anim.framerate ?? 24, anim.loop ?? false);
-			if (anim.offsets != null)
-				addOffset(anim.name, anim.offsets[0] ?? 0.0, anim.offsets[1] ?? 0.0);
-			else
-				addOffset(anim.name, 0, 0);
+			if (anim.indices != null) animation.addByIndices(anim.name, anim.prefix, anim.indices, '', anim.framerate ?? 24, anim.loop ?? false);
+			else animation.addByPrefix(anim.name, anim.prefix, anim.framerate ?? 24, anim.loop ?? false);
+			if (anim.offsets != null) addOffset(anim.name, anim.offsets[0] ?? 0.0, anim.offsets[1] ?? 0.0);
+			else addOffset(anim.name, 0, 0);
 
 			if (anim.loopIndices != null) {
 				animation.addByIndices(anim.name + '-loop', anim.prefix, anim.loopIndices, '', anim.framerate ?? 24, true);
@@ -86,10 +82,7 @@ class Character extends FunkinSprite {
 			forcedPlayer = true;
 		}
 
-		animation.onFinish.add(function(animName:String) {
-			if (animation.exists(animName + '-loop')) playAnim(animName + '-loop', true, false, 0);
-		});
-
+		animation.onFinish.add(function(animName:String) if (animation.exists(animName + '-loop')) playAnim(animName + '-loop', true, false, 0));
 		playAnim(shouldAlternate? 'danceRight' : 'idle', true);
 	}
 

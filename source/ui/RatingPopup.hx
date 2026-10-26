@@ -21,7 +21,7 @@ class RatingPopup extends FlxSpriteGroup {
     public function new(pathPrefix:String, pathSuffix:String) {
         super();
 
-        this.pathPrefix = pathPrefix;
+        this.pathPrefix = 'notestyles/$pathPrefix';
         this.pathSuffix = pathSuffix;
 
         rating = new FlxSprite().loadGraphic(Paths.image(pathPrefix + 'sick' + pathSuffix));

@@ -43,7 +43,7 @@ class MainMenuState extends MusicBeatState
 		bgBlank = new FlxSprite(-80).makeGraphic(1,1, -1);
 		bgBlank.color = colorsToUse[0][0];
 
-		bgOutline = new FlxSprite(-80).loadGraphic(Paths.image('menuOutline'));
+		bgOutline = new FlxSprite(-80).loadGraphic(Paths.image('mainmenu/menuOutline'));
 		bgOutline.scrollFactor.x = 0;
 		bgOutline.scrollFactor.y = 0.15;
 		bgOutline.setGraphicSize(Std.int(bgOutline.width * 1.1));

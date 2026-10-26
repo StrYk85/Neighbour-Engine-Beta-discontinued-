@@ -14,18 +14,18 @@ class NoteStyle {
         switch (noteStyle) {
             case 'pixel':
 				if (obj.isSustainNote) {
-					obj.loadGraphic(Paths.image('weeb/pixelUI/arrowEnds','week6'), true, 7, 6);
+					obj.loadGraphic(Paths.image('weeb/pixelUI/arrowEnds'), true, 7, 6);
 					obj.animation.add('holdend', [obj.noteData + 4]);
 					obj.animation.add('hold', [obj.noteData]);
 				}
                 else {
-                    obj.loadGraphic(Paths.image('weeb/pixelUI/arrows-pixels','week6'), true, 17, 17);
+                    obj.loadGraphic(Paths.image('weeb/pixelUI/arrows-pixels'), true, 17, 17);
                     obj.animation.add('scroll', [obj.noteData + 4]);
                 }
 
                 zoomToUse = daPixelZoom;
             default:
-                obj.frames = Paths.getSparrowAtlas('notestyles/default/NOTE_assets', 'shared');
+                obj.frames = Paths.getSparrowAtlas('notestyles/default/NOTE_assets');
 				var colors = Defaults.NOTE_COLOR_NAMES;
                 if (obj.isSustainNote) {
                     obj.animation.addByPrefix('hold',  colors[obj.noteData].toLowerCase() + ' hold piece');
@@ -53,7 +53,7 @@ class NoteStyle {
                 zoomToUse = daPixelZoom;
             default:
                 var noteDirections = Defaults.NOTE_DIRECTIONS;
-                obj.frames = Paths.getSparrowAtlas('notestyles/default/NOTESTRUMLINE_assets', 'shared');
+                obj.frames = Paths.getSparrowAtlas('notestyles/default/NOTESTRUMLINE_assets');
                 obj.animation.addByPrefix('static', 'arrow' + noteDirections[direction].toUpperCase());
                 obj.animation.addByPrefix('pressed', noteDirections[direction].toLowerCase() + ' press', 24, false);
                 obj.animation.addByPrefix('confirm', noteDirections[direction].toLowerCase() + ' confirm', 24, false);
