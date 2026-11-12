@@ -1,0 +1,21 @@
+{
+    "assetPath": "characters/bf-dead",
+    "animations": [
+        {
+            "name": "firstDeath",
+            "prefix": "BF dies",
+            "offsets": [37, 11]
+        },
+        {
+            "name": "deathLoop",
+            "prefix": "BF HEY",
+            "offsets": [37, 5],
+            "loop": true
+        },
+        {
+            "name": "deathConfirm",
+            "prefix": "BF idle shaking",
+            "offsets": [37, 69]
+        }
+    ]
+}

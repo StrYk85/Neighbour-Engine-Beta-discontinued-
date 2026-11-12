@@ -1,13 +1,8 @@
 package debug;
 
-import Conductor.BPMChangeEvent;
-import Section.SwagSection;
-import Song.SwagSong;
-import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.addons.ui.FlxInputText;
-import flixel.addons.ui.FlxUI9SliceSprite;
 import flixel.addons.ui.FlxUI;
 import flixel.addons.ui.FlxUICheckBox;
 import flixel.addons.ui.FlxUIDropDownMenu;
@@ -23,25 +18,26 @@ import flixel.sound.FlxSound;
 import flixel.text.FlxText;
 import flixel.ui.FlxButton;
 import flixel.ui.FlxSpriteButton;
-import flixel.util.FlxColor;
 import haxe.Json;
-import lime.utils.Assets;
-import openfl.utils.Assets as OpenFlAssets;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
-import openfl.media.Sound;
 import openfl.net.FileReference;
-import openfl.utils.ByteArray;
-import flixel.addons.ui.FlxUIState;
 import flixel.util.FlxStringUtil;
 
-import ui.HealthIcon;
+import play.ui.HealthIcon;
+import play.PlayState;
+import play.Conductor;
+import play.Conductor.BPMChangeEvent;
+import play.Section.SwagSection;
+import play.Section;
+import play.Song.SwagSong;
+import play.Song;
 import ui.DefaultText;
-import notes.Note;
+import graphics.FunkinSprite;
 
 using StringTools;
 
-class ChartingState extends FlxUIState
+class ChartingState extends flixel.addons.ui.FlxUIState
 {
 	/*
 		charting menu fixes and changes by @OldFlag (thanks man !! :D)
@@ -192,7 +188,7 @@ class ChartingState extends FlxUIState
 		var reloadSongJson:FlxButton = new FlxButton(reloadSong.x, saveButton.y + 30, "Reload JSON", () -> loadJson(_song.song.toLowerCase()));
 		var loadAutosaveBtn:FlxButton = new FlxButton(reloadSongJson.x, reloadSongJson.y + 30, 'Load Autosave', loadAutosave);
 
-		var dificulties = CoolUtil.difficultyArray.copy();
+		var dificulties = backend.Defaults.difficultyArray.copy();
 		var difficultyList = InterfaceUtil.createDropDown(loadAutosaveBtn.x - 30, loadAutosaveBtn.y + 40, 'Difficulty', dificulties, 
 		function(dif:String) {curDifficulty = dificulties[Std.parseInt(dif)];}, curDifficulty);
 
@@ -526,10 +522,10 @@ class ChartingState extends FlxUIState
 				lastSection = curSection;
 
 				PlayState.SONG = _song;
-				PlayState.storyDifficulty = CoolUtil.difficultyArray.indexOf(curDifficulty);
+				PlayState.storyDifficulty = backend.Defaults.difficultyArray.indexOf(curDifficulty);
 				FlxG.sound.music.stop();
 				vocals.stop();
-				LoadingState.loadAndSwitchState(new PlayState());
+				states.LoadingState.loadAndSwitchState(new PlayState());
 			}
 		}
 
@@ -906,15 +902,15 @@ class ChartingState extends FlxUIState
 
 	function loadJson(song:String):Void {
 		var dif = curDifficulty.toLowerCase() == 'normal'? '' : curDifficulty.toLowerCase();
-		if (!OpenFlAssets.exists(Paths.json('songs/$song/$song-$dif'))) return;
+		if (!openfl.utils.Assets.exists(Paths.json('songs/$song/$song-$dif'))) return;
 		_songID = '$song-$dif';
 		PlayState.SONG = Song.loadFromJson(_songID, song);
-		LoadingState.loadAndSwitchState(new ChartingState());
+		states.LoadingState.loadAndSwitchState(new ChartingState());
 	}
 
 	function loadAutosave():Void {
 		PlayState.SONG = Song.parseJSONshit(FlxG.save.data.autosave);
-		LoadingState.loadAndSwitchState(new ChartingState());
+		states.LoadingState.loadAndSwitchState(new ChartingState());
 	}
 
 	function autosaveSong():Void {

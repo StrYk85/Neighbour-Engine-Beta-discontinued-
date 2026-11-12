@@ -1,7 +1,9 @@
 {
-    "assetPath": "characters/BOYFRIEND",
+    "assetPath": "characters/bf",
+    "deadCharacter": "bf-dead",
     "nativelyPlayable": true,
     "playerCameraOffsets": [-100, -100],
+    "iconColor": "0xAF66CE",
     "animations": [
         {
             "name": "idle",

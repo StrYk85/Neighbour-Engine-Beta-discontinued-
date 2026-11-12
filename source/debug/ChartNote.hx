@@ -2,8 +2,9 @@ package debug;
 
 import flixel.group.FlxSpriteGroup;
 import flixel.math.FlxMath;
-import notes.Note;
-import notes.NoteStyle;
+import play.notes.Note;
+import play.notes.NoteStyle;
+import graphics.FunkinSprite;
 
 class ChartNote extends FlxSpriteGroup {
     private var GRID_SIZE:Int = 40;
@@ -39,8 +40,8 @@ class ChartNote extends FlxSpriteGroup {
 
     public function changeSustainLength(value:Float, stepLength:Float):Void {
         if (value <= 0) value = 0;
-        sustainNote.scale.y = Math.floor(FlxMath.remapToRange(value, 0, Conductor.stepCrochet * stepLength, 0, GRID_SIZE * stepLength));
-        sustainNote.color = Defaults.NOTE_COLORS[note.noteData];
+        sustainNote.scale.y = Math.floor(FlxMath.remapToRange(value, 0, play.Conductor.stepCrochet * stepLength, 0, GRID_SIZE * stepLength));
+        sustainNote.color = backend.Defaults.NOTE_COLORS[note.noteData];
 		sustainNote.updateHitbox();
     }
 }

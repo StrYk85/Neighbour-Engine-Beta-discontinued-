@@ -4,8 +4,7 @@ import flixel.input.gamepad.FlxGamepad;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import openfl.Lib;
-import Options;
-import Controls.Control;
+import backend.Controls.Control;
 import flash.text.TextField;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -16,8 +15,9 @@ import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import lime.utils.Assets;
+import ui.Alphabet;
 
-class DebugMenu extends MusicBeatState
+class DebugMenu extends ui.MusicBeatState
 {
 	var curSelected:Int = 0;
 	var options:Array<String> = ['chart editor', 'animation editor'];
@@ -42,7 +42,7 @@ class DebugMenu extends MusicBeatState
 
 		for (i in 0...options.length)
 		{
-			var controlLabel:Alphabet = new Alphabet(0, (70 * i) + 30, options[i], true, false, true);
+			var controlLabel:Alphabet = new Alphabet(0, (70 * i) + 30, options[i], true, false);
 			controlLabel.isMenuItem = true;
 			controlLabel.targetY = i;
 			grpControls.add(controlLabel);
@@ -71,7 +71,7 @@ class DebugMenu extends MusicBeatState
 		super.update(elapsed);
 
 		if (acceptInput) {
-			if (controls.BACK) FlxG.switchState(new MainMenuState());
+			if (controls.BACK) FlxG.switchState(new states.MainMenuState());
 
 			if (FlxG.keys.justPressed.UP)
 				changeSelection(-1);

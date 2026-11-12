@@ -29,7 +29,7 @@
 	<set name="BUILD_DIR" value="export/release" unless="debug" />
 	<set name="BUILD_DIR" value="export/32bit" if="32bit" />
 
-	<assets path='example_mods' rename='mods' embed='false'/>
+	<!-- <assets path='example_mods' rename='mods' embed='false'/> -->
 	<assets path='art/readme.txt' rename='do NOT readme.txt' />
 	<classpath name="source" />
 	<assets path="assets" />
@@ -40,7 +40,7 @@
 	<haxelib name="flixel-ui" />
 	<haxelib name="hscript" />
 	<!-- <haxelib name="hxvlc" if="desktop || android" /> -->
-	<haxelib name="faxe" if='switch'/>
+	<!-- <haxelib name="faxe" if='switch'/> -->
 
 	<!-- ______________________________ Haxedefines _____________________________ -->
 

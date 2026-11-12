@@ -10,12 +10,13 @@ import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import lime.utils.Assets;
-import ui.HealthIcon;
+import play.ui.HealthIcon;
+import ui.Alphabet;
 import debug.DebugMenu;
 
 using StringTools;
 
-class CharacterSelect extends MusicBeatState
+class CharacterSelect extends ui.MusicBeatState
 {
 	var characters:Array<String> = [];
 
@@ -42,7 +43,7 @@ class CharacterSelect extends MusicBeatState
 		for (i => char in characters)
 		{
 			var charName = StringTools.replace(char, '-', ' ');
-			var name:Alphabet = new Alphabet(0, (70 * i) + 30, char, true, false, true);
+			var name:Alphabet = new Alphabet(0, (70 * i) + 30, char, true, false);
 			name.isMenuItem = true;
 			name.targetY = i;
 			grpCharacters.add(name);

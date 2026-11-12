@@ -1,18 +1,10 @@
 package debug;
 
-import haxe.Timer;
-import openfl.events.Event;
-import openfl.text.TextField;
-import openfl.text.TextFormat;
-import openfl.Lib;
-import openfl.system.System;
 import flixel.util.FlxStringUtil;
 
-class FunkinFPS extends TextField {
+class FunkinFPS extends openfl.text.TextField {
 	public var currentFPS(default, null):Int;
 	private var memPeak:Float = 0;
-
-	@:noCompletion private var cacheCount:Int;
 	@:noCompletion private var times:Array<Float>;
 
 	public function new(x:Float = 10, y:Float = 3, color:Int = 0xFFFFFF) {
@@ -22,7 +14,7 @@ class FunkinFPS extends TextField {
 
 		selectable = false;
 		mouseEnabled = false;
-		defaultTextFormat = new TextFormat("_sans", 12, color);
+		defaultTextFormat = new openfl.text.TextFormat('VCR OSD Mono', 12, color);
         autoSize = LEFT;
 		multiline = true;
 		text = "FPS: ";
@@ -30,16 +22,16 @@ class FunkinFPS extends TextField {
 	}
 
 	private override function __enterFrame(deltaTime:Float):Void {
-		var currentTime:Float = Lib.getTimer();
+		var currentTime:Float = openfl.Lib.getTimer();
 		times.push(currentTime);
 
 		while (times[0] < currentTime - 1000) times.shift();
 
         currentFPS = times.length;
 
-		var mem = System.totalMemoryNumber;
+		var mem = openfl.system.System.totalMemoryNumber;
 		if (mem > memPeak) memPeak = mem;
 
-        text = 'FPS: ' + currentFPS + ' | Memory: ' + FlxStringUtil.formatBytes(mem) + ' / ' + FlxStringUtil.formatBytes(memPeak);
+        text = 'FPS: ' + currentFPS + ' | GC MEM: ' + FlxStringUtil.formatBytes(mem) + ' / ' + FlxStringUtil.formatBytes(memPeak);
 	}
 }

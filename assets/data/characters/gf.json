@@ -1,5 +1,6 @@
 {
-    "assetPath": "characters/GF_assets",
+    "assetPath": "characters/gf",
+    "iconColor": "0xA5004D",
     "animations": [
         {
             "name": "danceLeft",

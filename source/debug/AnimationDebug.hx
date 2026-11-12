@@ -1,18 +1,14 @@
 package debug;
 
-import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
-import debug.CharacterSelect;
+import play.stage.Character;
 
-/**
-	*DEBUG MODE
- */
-class AnimationDebug extends MusicBeatState
+class AnimationDebug extends ui.MusicBeatState
 {
 	var char:Character;
 	var textAnim:FlxText;
@@ -94,7 +90,7 @@ class AnimationDebug extends MusicBeatState
 	{
 		textAnim.text = char.animation.curAnim.name;
 
-		if (controls.BACK) FlxG.switchState(new CharacterSelect());
+		if (controls.BACK) FlxG.switchState(new debug.CharacterSelect());
 
 		if (FlxG.keys.justPressed.E)
 			FlxG.camera.zoom += 0.25;
