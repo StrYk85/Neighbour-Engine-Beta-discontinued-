@@ -55,7 +55,7 @@ class HealthBar extends flixel.group.FlxSpriteGroup {
             var iconOffset = backend.Defaults.DEFAULT_ICON_OFFSET;
             var offsetSHIT:Float = icon.isPlayer? iconOffset : icon.width - iconOffset;
             icon.x = bar.x + bar.width * (FlxMath.remapToRange(bar.percent, 0, 100, bar.flipX? 0 : 100, bar.flipX? 100 : 0) * 0.01) - offsetSHIT;
-            icon.y = bar.y + (bar.height - icon.height) / 2;
+            icon.y = bar.y + (bar.height - icon.height) / 2 - 5;
 
             icon.percent = bar.percent;
         }

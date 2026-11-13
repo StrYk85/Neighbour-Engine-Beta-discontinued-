@@ -72,7 +72,6 @@ class Character extends Bopper {
 
 	public function taunt():Void {
 		var animToPlay:String = '';
-		// All possible animations that can be considered as taunts, this includes the up pose because why not LOL
 		for (anim in ['hey', 'cheer', 'taunt']) {
 			if (animation.exists(anim)) {
 				animToPlay = anim;

@@ -4,7 +4,7 @@
     "playerCameraOffsets": [-150, -100],
     "playerOffsets": [0, -350],
     "singTime": 6.1,
-    "iconColor": "0x31B0D1",
+    "iconColor": "0xAF66CE",
     "animations": [
         {
             "name": "idle",

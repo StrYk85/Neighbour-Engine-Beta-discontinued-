@@ -3,7 +3,7 @@
     "deadCharacter": "bf-dead",
     "nativelyPlayable": true,
     "playerCameraOffsets": [-100, -100],
-    "iconColor": "0xAF66CE",
+    "iconColor": "0x31B0D1",
     "animations": [
         {
             "name": "idle",
