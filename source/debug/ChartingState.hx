@@ -37,14 +37,12 @@ import graphics.FunkinSprite;
 
 using StringTools;
 
-class ChartingState extends flixel.addons.ui.FlxUIState
-{
-	/*
-		charting menu fixes and changes by @OldFlag (thanks man !! :D)
-	 */
-	var _file:FileReference;
+class ChartingState extends flixel.addons.ui.FlxUIState {
+	var GRID_SIZE:Int = 40;
 
+	var _file:FileReference;
 	var UI_box:FlxUITabMenu;
+	var typingShit:FlxInputText;
 
 	/**
 	 * Array of notes showing when each section STARTS in STEPS
@@ -54,21 +52,15 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 	public static var lastSection:Int = 0;
 
 	var infoTxt:DefaultText;
-
 	var strumLine:FunkinSprite;
-	var amountSteps:Int = 0;
 	var bullshitUI:FlxGroup;
-
-	var highlight:FlxSprite;
-
-	var GRID_SIZE:Int = 40;
-
 	var dummyArrow:FunkinSprite;
+	var gridBG:FlxSprite;
+	var leftIcon:HealthIcon;
+	var rightIcon:HealthIcon;
 
 	var curRenderedNotes(default, null):FlxTypedGroup<ChartNote> = new FlxTypedGroup<ChartNote>();
 	private var recyclableNotes(default, null):FlxTypedGroup<ChartNote> = new FlxTypedGroup<ChartNote>();
-
-	var gridBG:FlxSprite;
 
 	public static var _songID:String = 'tutorial-hard';
 	var _song:SwagSong;
@@ -76,17 +68,10 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 	var curDifficulty:String = 'Normal';
 	private var songDifficulty:String = 'Normal';
 
-	var typingShit:FlxInputText;
-	/*
-	 * WILL BE THE CURRENT / LAST PLACED NOTE
-	**/
 	var curSelectedNote:Array<Dynamic>;
 
 	var tempBpm:Float = 0;
 	var vocals:FlxSound;
-
-	var leftIcon:HealthIcon;
-	var rightIcon:HealthIcon;
 
 	private var curStep:Int = 0;
 	private var curBeat:Int = 0;
@@ -106,18 +91,11 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 		_song = PlayState.SONG != null? PlayState.SONG : Song.loadFromJson('tutorial-hard', 'tutorial');
 
 		FlxG.mouse.visible = true;
-		FlxG.save.bind('funkin', 'ninjamuffin99');
+		FlxG.save.bind('neighbour_engine', 'stryk85');
 
 		leftIcon = new HealthIcon(_song.player1);
 		rightIcon = new HealthIcon(_song.player2);
-		leftIcon.scrollFactor.set(1, 1);
-		rightIcon.scrollFactor.set(1, 1);
-
-		leftIcon.setGraphicSize(0, 45);
-		rightIcon.setGraphicSize(0, 45);
-
-		add(leftIcon);
-		add(rightIcon);
+		for (i in [leftIcon, rightIcon]) {i.scrollFactor.set(1, 1); i.setGraphicSize(50); add(i);}
 
 		leftIcon.setPosition(0, -100);
 		rightIcon.setPosition(gridBG.width / 2, -100);
@@ -134,12 +112,8 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 		curDifficulty = getDifficulty(_songID);
 		songDifficulty = curDifficulty;
 
-		infoTxt = new DefaultText(1000, 50, '', true);
-		infoTxt.scrollFactor.set();
-		add(infoTxt);
-
 		strumLine = new FunkinSprite(0, 50);
-		strumLine.makeSolid(Std.int(FlxG.width / 2), 4, -1);
+		strumLine.makeSolid(GRID_SIZE * 8, 4, 0xFFFF0000);
 		add(strumLine);
 
 		dummyArrow = new FunkinSprite(0, 0);
@@ -154,11 +128,14 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 		];
 
 		UI_box = new FlxUITabMenu(null, tabs, true);
-
 		UI_box.resize(300, 400);
-		UI_box.x = FlxG.width / 2;
+		UI_box.x = FlxG.width - 300 - 150;
 		UI_box.y = 20;
 		add(UI_box);
+
+		infoTxt = new DefaultText(UI_box.x, UI_box.y + 400 + 25, '', true);
+		infoTxt.scrollFactor.set();
+		add(infoTxt);
 
 		addSongUI();
 		addSectionUI();
@@ -473,7 +450,6 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 			trace('DUMBSHIT');
 
 			if (_song.notes[curSection + 1] == null) addSection();
-
 			changeSection(curSection + 1, false);
 		}
 		else if (strumLine.y < -10) {
@@ -494,19 +470,16 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 					if (FlxG.mouse.overlaps(note)) {
 						if (FlxG.keys.pressed.CONTROL)
 							selectNote(note);
-						else
-						{
+						else {
 							trace('tryin to delete note...');
 							deleteNote(note);
 						}
 					}
 				});
 			}
-			else {
-				if (isInGrid()) {
-					trace('added note!');
-					addNote();
-				}
+			else if (isInGrid()) {
+				trace('added note!');
+				addNote();
 			}
 		}
 
@@ -529,11 +502,7 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 			}
 		}
 
-		if (FlxG.keys.justPressed.E)
-			changeNoteSustain(Conductor.stepCrochet);
-
-		if (FlxG.keys.justPressed.Q)
-			changeNoteSustain(-Conductor.stepCrochet);
+		changeNoteSustain(FlxG.keys.justPressed.E? Conductor.stepCrochet : FlxG.keys.justPressed.Q? -Conductor.stepCrochet : 0);
 
 		if (FlxG.keys.justPressed.TAB) {
 			if (FlxG.keys.pressed.SHIFT) {
@@ -549,6 +518,13 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 		}
 
 		if (!typingShit.hasFocus) {
+			if (FlxG.mouse.wheel != 0) {
+				FlxG.sound.music.pause();
+				vocals.pause();
+
+				FlxG.sound.music.time -= (FlxG.mouse.wheel * Conductor.stepCrochet * 0.4);
+				vocals.time = FlxG.sound.music.time;
+			}
 
 			if (FlxG.keys.justPressed.SPACE) {
 				if (FlxG.sound.music.playing) {
@@ -561,39 +537,21 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 				}
 			}
 
-			if (FlxG.keys.justPressed.R) 
-				resetSection(FlxG.keys.pressed.SHIFT);
-
-			if (FlxG.sound.music.time < 0 || curStep < 0)
-				FlxG.sound.music.time = 0;
-
-			if (FlxG.mouse.wheel != 0) {
-				FlxG.sound.music.pause();
-				vocals.pause();
-
-				FlxG.sound.music.time -= (FlxG.mouse.wheel * Conductor.stepCrochet * 0.4);
-				vocals.time = FlxG.sound.music.time;
-			}
-
 			if (FlxG.keys.justPressed.W || FlxG.keys.justPressed.S) {
 				FlxG.sound.music.pause();
 				vocals.pause();
 
-				var daTime:Float = FlxG.keys.pressed.SHIFT? 700 * FlxG.elapsed : Conductor.stepCrochet * 2;
-
-				if (FlxG.keys.justPressed.W)
-					FlxG.sound.music.time -= daTime;
-				else
-					FlxG.sound.music.time += daTime;
-
+				FlxG.sound.music.time += (FlxG.keys.justPressed.W? -1 : 1) * (FlxG.keys.pressed.SHIFT? 700 * FlxG.elapsed : Conductor.stepCrochet * 2);
 				vocals.time = FlxG.sound.music.time;
 			}
 
+			if (FlxG.keys.justPressed.R) resetSection(FlxG.keys.pressed.SHIFT);
+
 			var shiftThing:Int = FlxG.keys.pressed.SHIFT? 4 : 1;
-			if (FlxG.keys.justPressed.RIGHT || FlxG.keys.justPressed.D)
-				changeSection(curSection + shiftThing);
-			if (FlxG.keys.justPressed.LEFT || FlxG.keys.justPressed.A)
-				changeSection(curSection - shiftThing);
+			if (FlxG.keys.justPressed.RIGHT || FlxG.keys.justPressed.D) changeSection(curSection + shiftThing);
+			if (FlxG.keys.justPressed.LEFT || FlxG.keys.justPressed.A) changeSection(curSection - shiftThing);
+
+			if (FlxG.sound.music.time < 0 || curStep < 0) FlxG.sound.music.time = 0;
 		}
 
 		_song.bpm = tempBpm;
@@ -615,6 +573,7 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 	}
 
 	function changeNoteSustain(value:Float):Void {
+		if (value == 0) return;
 		if (curSelectedNote != null) {
 			if (curSelectedNote[2] != null) {
 				curSelectedNote[2] += value;
@@ -653,14 +612,11 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 		FlxG.sound.music.pause();
 		vocals.pause();
 
-		// Basically old shit from changeSection???
-		FlxG.sound.music.time = sectionStartTime();
-
-		if (songBeginning)
-		{
+		if (songBeginning) {
 			FlxG.sound.music.time = 0;
 			curSection = 0;
 		}
+		else FlxG.sound.music.time = sectionStartTime(); // Basically old shit from changeSection???
 
 		vocals.time = FlxG.sound.music.time;
 		updateCurStep(true);
@@ -669,16 +625,13 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 		updateSectionUI();
 	}
 
-	function changeSection(sec:Int = 0, ?updateMusic:Bool = true):Void
-	{
+	function changeSection(sec:Int = 0, ?updateMusic:Bool = true):Void {
 		trace('changing section' + sec);
 
-		if (_song.notes[sec] != null)
-		{
+		if (_song.notes[sec] != null) {
 			curSection = sec;
 
-			if (updateMusic)
-			{
+			if (updateMusic) {
 				FlxG.sound.music.pause();
 				vocals.pause();
 
@@ -732,8 +685,7 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 	}
 
 	function updateNoteUI():Void {
-		if (curSelectedNote != null)
-			stepperSusLength.value = curSelectedNote[2];
+		if (curSelectedNote != null) stepperSusLength.value = curSelectedNote[2];
 	}
 
 	function updateGrid():Void {
@@ -875,15 +827,12 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 
 	function getNotes():Array<Dynamic> {
 		var noteData:Array<Dynamic> = [];
-
-		for (i in _song.notes)
-			noteData.push(i.sectionNotes);
-
+		for (i in _song.notes) noteData.push(i.sectionNotes);
 		return noteData;
 	}
 
 	function getDifficulty(name:String):String {
-		if (!name.contains('-')) return 'Normal'; // assume it is just the default difficulty
+		if (!name.contains('-')) return 'Normal'; // assume it is the normal difficulty
 
 		var choppedName:Array<String> = name.split('-');
 		var finalName = choppedName[choppedName.length - 1];
@@ -929,42 +878,41 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 
 		if ((data != null) && (data.length > 0)) {
 			_file = new FileReference();
-			_file.addEventListener(Event.COMPLETE, onSaveComplete);
-			_file.addEventListener(Event.CANCEL, onSaveCancel);
-			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+			addListeners();
 			_file.save(data.trim(), _song.song.toLowerCase() + '.json');
 		}
 	}
 
-	function onSaveComplete(_):Void
-	{
+	private function addListeners() {
+		_file.addEventListener(Event.COMPLETE, onSaveComplete);
+		_file.addEventListener(Event.CANCEL, onSaveCancel);
+		_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+	}
+
+	private function removeListeners() {
 		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
 		_file.removeEventListener(Event.CANCEL, onSaveCancel);
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 		_file = null;
+	}
+
+	function onSaveComplete(_):Void {
+		removeListeners();
 		FlxG.log.notice('Successfully saved LEVEL DATA.');
 	}
 
 	/**
 	 * Called when the save file dialog is cancelled.
 	 */
-	function onSaveCancel(_):Void
-	{
-		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
-		_file.removeEventListener(Event.CANCEL, onSaveCancel);
-		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-		_file = null;
+	function onSaveCancel(_):Void {
+		removeListeners();
 	}
 
 	/**
 	 * Called if there is an error while saving the gameplay recording.
 	 */
-	function onSaveError(_):Void
-	{
-		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
-		_file.removeEventListener(Event.CANCEL, onSaveCancel);
-		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-		_file = null;
+	function onSaveError(_):Void {
+		removeListeners();
 		FlxG.log.error('Problem saving Level data');
 	}
 }
