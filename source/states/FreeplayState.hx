@@ -61,23 +61,17 @@ class FreeplayState extends ui.MusicBeatState {
 			add(icon);
 		}
 
-		scoreText = new FlxText(FlxG.width * 0.7, 5, 0, '', 32);
-		scoreText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, RIGHT);
+		scoreText = new FlxText(FlxG.width * 0.7, 5, 0, '', 32).setFormat(Paths.font('vcr.ttf'), 32, FlxColor.WHITE, RIGHT);
+		diffText = new FlxText(scoreText.x, scoreText.y + 36, 0, '', 24);
+		comboText = new FlxText(diffText.x + 100, diffText.y, 0, '', 24);
+		comboText.font = diffText.font = scoreText.font;
 
 		var scoreBG:FunkinSprite = new FunkinSprite(scoreText.x - 6, 0);
 		scoreBG.makeSolid(Std.int(FlxG.width * 0.35), 66, 0xFF000000);
 		scoreBG.alpha = 0.6;
 		add(scoreBG);
 
-		diffText = new FlxText(scoreText.x, scoreText.y + 36, 0, '', 24);
-		diffText.font = scoreText.font;
-		add(diffText);
-
-		comboText = new FlxText(diffText.x + 100, diffText.y, 0, "", 24);
-		comboText.font = diffText.font;
-		add(comboText);
-
-		add(scoreText);
+		for (i in [diffText, comboText, scoreText]) {i.antialiasing = true; add(i);}
 
 		changeSelection(0, true);
 		changeDiff(0, true);
@@ -89,8 +83,7 @@ class FreeplayState extends ui.MusicBeatState {
 		songs.push(new SongMetadata(songName, weekNum, songCharacter));
 	}
 
-	public function addWeek(songs:Array<String>, weekNum:Int, ?songCharacters:Array<String>)
-	{
+	public function addWeek(songs:Array<String>, weekNum:Int, ?songCharacters:Array<String>) {
 		if (songCharacters == null) songCharacters = ['dad'];
 
 		var num:Int = 0;
@@ -100,15 +93,14 @@ class FreeplayState extends ui.MusicBeatState {
 		}
 	}
 
-	override function update(elapsed:Float)
-	{
+	override function update(elapsed:Float) {
 		super.update(elapsed);
 		if (FlxG.sound.music.volume < 0.7) FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
 
 		lerpScore = Math.floor(FlxMath.lerp(lerpScore, intendedScore, 0.4));
 		if (Math.abs(lerpScore - intendedScore) <= 10) lerpScore = intendedScore;
 
-		scoreText.text = "PERSONAL BEST:" + lerpScore;
+		scoreText.text = 'PERSONAL BEST: ${flixel.util.FlxStringUtil.formatMoney(lerpScore, false)}';
 		comboText.text = combo + '\n';
 
 		var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
@@ -124,7 +116,7 @@ class FreeplayState extends ui.MusicBeatState {
 		if (controls.ACCEPT)
 		{
 			// adjusting the song name to be compatible
-			var songFormat = StringTools.replace(songs[curSelected].songName, " ", "-");
+			var songFormat = StringTools.replace(songs[curSelected].songName, ' ', '-');
 			trace(songs[curSelected].songName);
 
 			var poop:String = Highscore.formatSong(songFormat, curDifficulty);
@@ -132,41 +124,34 @@ class FreeplayState extends ui.MusicBeatState {
 			
 			PlayState.SONG = play.Song.loadFromJson(poop, songs[curSelected].songName);
 			PlayState.isStoryMode = false;
-			PlayState.storyDifficulty = curDifficulty;
+			PlayState.curDifficulty = curDifficulty;
 			PlayState.storyWeek = songs[curSelected].week;
-			trace('CUR WEEK' + PlayState.storyWeek);
 			LoadingState.loadAndSwitchState(new PlayState());
 		}
 	}
 
-	function changeDiff(change:Int = 0, force:Bool = false)
-	{
-		if (change == 0) return;
-		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
-		curDifficulty = FlxMath.wrap(curDifficulty + change, 0, 2);
-
-		// adjusting the highscore song name to be compatible (changeDiff)
-		var songHighscore = StringTools.replace(songs[curSelected].songName, " ", "-");
-		
+	function setupScore() {
 		#if !switch
+		var songHighscore = StringTools.replace(songs[curSelected].songName, ' ', '-');
 		intendedScore = Highscore.getScore(songHighscore, curDifficulty);
 		combo = Highscore.getCombo(songHighscore, curDifficulty);
 		#end
+	}
+
+	function changeDiff(change:Int = 0, force:Bool = false) {
+		if (change == 0 && !force) return;
+		if (!force) FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+		curDifficulty = FlxMath.wrap(curDifficulty + change, 0, 2);
+		setupScore();
 
 		diffText.text = CoolUtil.difficultyFromInt(curDifficulty).toUpperCase();
 	}
 
-	function changeSelection(change:Int = 0, force:Bool = false)
-	{
-		if (change == 0) return;
-		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+	function changeSelection(change:Int = 0, force:Bool = false) {
+		if (change == 0 && !force) return;
+		if (!force) FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 		curSelected = FlxMath.wrap(curSelected + change, 0, songs.length - 1);
-		var songHighscore = StringTools.replace(songs[curSelected].songName, " ", "-");
-
-		#if !switch
-		intendedScore = Highscore.getScore(songHighscore, curDifficulty);
-		combo = Highscore.getCombo(songHighscore, curDifficulty);
-		#end
+		setupScore();
 
 		for (i in 0...iconArray.length) iconArray[i].alpha = i == curSelected? 1 : 0.6;
 		for (a => item in grpSongs.members) {
@@ -176,14 +161,12 @@ class FreeplayState extends ui.MusicBeatState {
 	}
 }
 
-class SongMetadata
-{
-	public var songName:String = "";
+class SongMetadata {
+	public var songName:String = '';
 	public var week:Int = 0;
-	public var songCharacter:String = "";
+	public var songCharacter:String = '';
 
-	public function new(song:String, week:Int, songCharacter:String)
-	{
+	public function new(song:String, week:Int, songCharacter:String) {
 		this.songName = song;
 		this.week = week;
 		this.songCharacter = songCharacter;

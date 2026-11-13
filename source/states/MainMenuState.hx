@@ -6,6 +6,7 @@ import backend.Defaults;
 import flixel.FlxG;
 import flixel.FlxObject;
 import graphics.FunkinSprite;
+import graphics.DynamicBackground;
 import flixel.effects.FlxFlicker;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxGroup.FlxTypedGroup;
@@ -15,52 +16,26 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import lime.app.Application;
-import debug.DebugMenu;
 
 using StringTools;
 
-class MainMenuState extends ui.MusicBeatState
-{
-	private var colorsToUse:Array<Array<FlxColor>> = [[0xFFFDE871, 0xFFDC7727],[0xFFFD719B, 0xFFDD29A7]];
-
+class MainMenuState extends ui.MusicBeatState {
 	var curSelected:Int = 0;
 	var menuItems:FlxTypedGroup<FunkinSprite>;
-	//var optionShit:Array<String> = ['story mode', 'freeplay', 'donate', 'options'];
-	var optionShit:Array<String> = ['freeplay', 'donate', 'options'];
+	var optionShit:Array<String> = ['story mode', 'freeplay', 'donate', 'options'];
 
-	var bgBlank:FunkinSprite;
-	var bgOutline:FunkinSprite;
+	var bg:DynamicBackground;
 	var camFollow:FlxObject;
 
-	override function create()
-	{
-		if (!FlxG.sound.music.playing)
-			FlxG.sound.playMusic(Paths.music('freakyMenu'));
-
+	override function create() {
+		if (!FlxG.sound.music.playing) FlxG.sound.playMusic(Paths.music('freakyMenu'));
 		persistentUpdate = persistentDraw = true;
 
-		bgBlank = new FunkinSprite(-80, 0);
-		bgBlank.makeSolid(1,1, -1);
-		bgBlank.color = colorsToUse[0][0];
-
-		bgOutline = new FunkinSprite(-80, 0);
-		bgOutline.loadGraphic(Paths.image('mainmenu/menuOutline'));
-		bgOutline.scrollFactor.x = 0;
-		bgOutline.scrollFactor.y = 0.15;
-		bgOutline.setGraphicSize(Std.int(bgOutline.width * 1.1));
-		bgBlank.setGraphicSize(Std.int(bgOutline.width * 1.1), Std.int(bgOutline.height * 1.1));
-		bgBlank.scrollFactor.set();
-
-		bgOutline.updateHitbox();
-		bgOutline.screenCenter();
-
-		bgBlank.updateHitbox();
-		bgBlank.screenCenter();
-
-		bgOutline.antialiasing = true;
-		bgOutline.color = colorsToUse[0][1];
-		add(bgBlank);
-		add(bgOutline);
+		bg = new DynamicBackground();
+		bg.setPosition(-80, -40);
+		bg.setScale(1.1, 1.1);
+		bg.scrollFactor.set(0, 0.15);
+		add(bg);
 
 		camFollow = new FlxObject(0, 0, 1, 1);
 		add(camFollow);
@@ -69,12 +44,11 @@ class MainMenuState extends ui.MusicBeatState
 		add(menuItems);
 
 		var tex = Paths.getSparrowAtlas('mainmenu/FNF_main_menu_assets');
-		for (i in 0...optionShit.length)
-		{
+		for (i in 0...optionShit.length) {
 			var menuItem:FunkinSprite = new FunkinSprite(0, FlxG.height * 1.6);
 			menuItem.frames = tex;
-			menuItem.animation.addByPrefix('idle', optionShit[i] + " basic", 24);
-			menuItem.animation.addByPrefix('selected', optionShit[i] + " white", 24);
+			menuItem.animation.addByPrefix('idle', optionShit[i] + ' basic', 24);
+			menuItem.animation.addByPrefix('selected', optionShit[i] + ' white', 24);
 			menuItem.animation.play('idle');
 			menuItem.ID = i;
 			menuItem.screenCenter(X);
@@ -85,70 +59,42 @@ class MainMenuState extends ui.MusicBeatState
 		}
 
 		FlxG.camera.follow(camFollow, null, 0.15);
-
-		controls.setKeyboardScheme(KeyboardScheme.Solo, true);
 		changeItem(0, true);
 
 		super.create();
 		if (leftWatermark != null) leftWatermark.text = Defaults.GAME_VERSION + ' FNF - ' + Defaults.ENGINE_TITLE + ' ' + Defaults.ENGINE_VERSION;
 	}
 
-	var selectedSomethin:Bool = false;
+	function toState(nextState:flixel.util.typeLimit.NextState) {
+		canInteract = false;
+		FlxG.switchState(nextState);
+	}
 
-	override function update(elapsed:Float)
-	{
-		if (FlxG.sound.music.volume < 0.8)
-			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
+	var canInteract:Bool = true;
+	override function update(elapsed:Float) {
+		if (FlxG.sound.music.volume < 0.8) FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
 
-		if (!selectedSomethin)
-		{
+		if (canInteract) {
 			var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
 			if (gamepad != null) changeItem(gamepad.justPressed.DPAD_UP? -1 : gamepad.justPressed.DPAD_DOWN? 1 : 0);
 			changeItem(FlxG.keys.justPressed.UP? -1 : FlxG.keys.justPressed.DOWN? 1 : 0);
 
-			if (controls.BACK) FlxG.switchState(new TitleState());
+			if (controls.BACK) toState(new TitleState());
+			if (FlxG.keys.justPressed.SEVEN) toState(new debug.DebugMenu());
 
-			if (FlxG.keys.justPressed.SEVEN) {
-				selectedSomethin = true;
-				FlxG.switchState(new DebugMenu());
-			}
+			if (controls.ACCEPT) {
+				canInteract = false;
+				FlxG.sound.play(Paths.sound('confirmMenu'));
+				bg.setSelectedColor(1);
 
-			if (controls.ACCEPT)
-			{
-				if (optionShit[curSelected] == 'donate') CoolUtil.fancyOpenURL("https://ninja-muffin24.itch.io/funkin");
-				else
-				{
-					selectedSomethin = true;
-					FlxG.sound.play(Paths.sound('confirmMenu'));
-
-					bgBlank.color = colorsToUse[1][0];
-					bgOutline.color = colorsToUse[1][1];
-
-					menuItems.forEach(function(spr:FunkinSprite)
-					{
-						if (curSelected != spr.ID)
-						{
-							FlxTween.tween(spr, {alpha: 0}, 1.3, {
-								ease: FlxEase.quadOut,
-								onComplete: function(twn:FlxTween)
-								{
-									spr.kill();
-								}
-							});
-						}
-						else
-						{
-							FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker) {
-								goToState();
-							});
-						}
-					});
-				}
+				menuItems.forEach(function(spr:FunkinSprite) {
+					if (curSelected != spr.ID) FlxTween.tween(spr, {alpha: 0}, 1.3, {ease: FlxEase.quadOut, onComplete: function(twn:FlxTween) spr.kill()});
+					else FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker) goToState());
+				});
 			}
 		}
 
 		super.update(elapsed);
-		menuItems.forEach((spr:FunkinSprite) -> spr.screenCenter(X));
 	}
 	
 	function goToState()
@@ -156,13 +102,16 @@ class MainMenuState extends ui.MusicBeatState
 		switch (optionShit[curSelected])
 		{
 			// case 'story mode':
-			// 	FlxG.switchState(new StoryMenuState());
-			// 	trace("Story Menu Selected");
+			// 	toState(new StoryMenuState());
 			case 'freeplay':
-				FlxG.switchState(new FreeplayState());
-				trace("Freeplay Menu Selected");
+				toState(new FreeplayState());
 			case 'options':
-				FlxG.switchState(new OptionsMenu());
+				toState(new OptionsMenu());
+			case 'donate':
+				CoolUtil.fancyOpenURL('https://ninja-muffin24.itch.io/funkin');
+				canInteract = true;
+			default: 
+				canInteract = true;
 		}
 	}
 
@@ -176,6 +125,7 @@ class MainMenuState extends ui.MusicBeatState
 			spr.playAnim(spr.ID == curSelected? 'selected' : 'idle');
 			if (spr.ID == curSelected) camFollow.setPosition(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y);
 			spr.updateHitbox();
+			spr.screenCenter(X);
 		});
 	}
 }

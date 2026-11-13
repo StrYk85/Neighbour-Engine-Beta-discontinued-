@@ -147,10 +147,10 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 		add(dummyArrow);
 
 		var tabs = [
-			{name: "Song", label: 'Song'},
-			{name: "Section", label: 'Section'},
-			{name: "Note", label: 'Note'},
-			{name: "Assets", label: 'Assets'}
+			{name: 'Song', label: 'Song'},
+			{name: 'Section', label: 'Section'},
+			{name: 'Note', label: 'Note'},
+			{name: 'Assets', label: 'Assets'}
 		];
 
 		UI_box = new FlxUITabMenu(null, tabs, true);
@@ -175,7 +175,7 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 		var UI_songTitle = new FlxUIInputText(10, 10, 70, _song.song, 8);
 		typingShit = UI_songTitle;
 
-		var check_voices = new FlxUICheckBox(10, 25, null, null, "Has vocal track", 100);
+		var check_voices = new FlxUICheckBox(10, 25, null, null, 'Has vocal track', 100);
 		check_voices.checked = _song.needsVoices;
 
 		check_voices.callback = function() {
@@ -183,9 +183,9 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 			trace('CHECKED IF SONG NEEDS VOCALS!');
 		};
 
-		var saveButton:FlxButton = new FlxButton(110, 8, "Save", () -> saveLevel());
-		var reloadSong:FlxButton = new FlxButton(saveButton.x + saveButton.width + 10, saveButton.y, "Reload Audio", () -> loadSong(_song.song));
-		var reloadSongJson:FlxButton = new FlxButton(reloadSong.x, saveButton.y + 30, "Reload JSON", () -> loadJson(_song.song.toLowerCase()));
+		var saveButton:FlxButton = new FlxButton(110, 8, 'Save', () -> saveLevel());
+		var reloadSong:FlxButton = new FlxButton(saveButton.x + saveButton.width + 10, saveButton.y, 'Reload Audio', () -> loadSong(_song.song));
+		var reloadSongJson:FlxButton = new FlxButton(reloadSong.x, saveButton.y + 30, 'Reload JSON', () -> loadJson(_song.song.toLowerCase()));
 		var loadAutosaveBtn:FlxButton = new FlxButton(reloadSongJson.x, reloadSongJson.y + 30, 'Load Autosave', loadAutosave);
 
 		var dificulties = backend.Defaults.difficultyArray.copy();
@@ -208,7 +208,7 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 		var instLabel = new FlxText(70, instVolume.y, 84, 'Instrumental Volume');
 
 		var tab_group_song = new FlxUI(null, UI_box);
-		tab_group_song.name = "Song";
+		tab_group_song.name = 'Song';
 		tab_group_song.add(UI_songTitle);
 
 		tab_group_song.add(check_voices);
@@ -260,7 +260,7 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 		}, _song.noteStyle);
 
 		var tab_group_assets = new FlxUI(null, UI_box);
-		tab_group_assets.name = "Assets";
+		tab_group_assets.name = 'Assets';
 
 		tab_group_assets.add(player1DropDown);
 		tab_group_assets.add(player2DropDown);
@@ -283,7 +283,7 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 
 		stepperLength = new FlxUINumericStepper(10, 10, 4, 0, 0, 999, 0);
 		stepperLength.value = _song.notes[curSection].lengthInSteps;
-		stepperLength.name = "section_length";
+		stepperLength.name = 'section_length';
 
 		stepperSectionBPM = new FlxUINumericStepper(10, 80, 1, Conductor.bpm, 0, 999, 0);
 		stepperSectionBPM.value = Conductor.bpm;
@@ -292,14 +292,14 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 		var stepperCopy:FlxUINumericStepper = new FlxUINumericStepper(110, 130, 1, 1, -999, 999, 0);
 		var stepperCopyLabel = new FlxText(174, 132, 'sections back');
 
-		var copyButton:FlxButton = new FlxButton(10, 130, "Copy last section", function()
+		var copyButton:FlxButton = new FlxButton(10, 130, 'Copy last section', function()
 		{
 			copySection(Std.int(stepperCopy.value));
 		});
 
-		var clearSectionButton:FlxButton = new FlxButton(10, 150, "Clear", clearSection);
+		var clearSectionButton:FlxButton = new FlxButton(10, 150, 'Clear', clearSection);
 
-		var swapSection:FlxButton = new FlxButton(10, 170, "Swap section", function()
+		var swapSection:FlxButton = new FlxButton(10, 170, 'Swap section', function()
 		{
 			for (i in 0..._song.notes[curSection].sectionNotes.length)
 			{
@@ -310,11 +310,11 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 			}
 		});
 
-		check_mustHitSection = new FlxUICheckBox(10, 30, null, null, "Must hit section", 100);
+		check_mustHitSection = new FlxUICheckBox(10, 30, null, null, 'Must hit section', 100);
 		check_mustHitSection.name = 'check_mustHit';
 		check_mustHitSection.checked = true;
 
-		check_altAnim = new FlxUICheckBox(10, 400, null, null, "Alt Animation", 100);
+		check_altAnim = new FlxUICheckBox(10, 400, null, null, 'Alt Animation', 100);
 		check_altAnim.name = 'check_altAnim';
 
 		check_changeBPM = new FlxUICheckBox(10, 60, null, null, 'Change BPM', 100);
@@ -403,7 +403,7 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 				case 'Change BPM':
 					_song.notes[curSection].changeBPM = check.checked;
 					FlxG.log.add('changed bpm shit');
-				case "Alt Animation":
+				case 'Alt Animation':
 					_song.notes[curSection].altAnim = check.checked;
 			}
 		}
@@ -522,7 +522,7 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 				lastSection = curSection;
 
 				PlayState.SONG = _song;
-				PlayState.storyDifficulty = backend.Defaults.difficultyArray.indexOf(curDifficulty);
+				PlayState.curDifficulty = backend.Defaults.difficultyArray.indexOf(curDifficulty);
 				FlxG.sound.music.stop();
 				vocals.stop();
 				states.LoadingState.loadAndSwitchState(new PlayState());
@@ -915,14 +915,14 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 
 	function autosaveSong():Void {
 		FlxG.save.data.autosave = Json.stringify({
-			"song": _song
+			'song': _song
 		});
 		FlxG.save.flush();
 	}
 
 	private function saveLevel() {
 		var json = {
-			"song": _song
+			'song': _song
 		};
 
 		var data:String = Json.stringify(json);
@@ -932,7 +932,7 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 			_file.addEventListener(Event.COMPLETE, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-			_file.save(data.trim(), _song.song.toLowerCase() + ".json");
+			_file.save(data.trim(), _song.song.toLowerCase() + '.json');
 		}
 	}
 
@@ -942,7 +942,7 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 		_file.removeEventListener(Event.CANCEL, onSaveCancel);
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 		_file = null;
-		FlxG.log.notice("Successfully saved LEVEL DATA.");
+		FlxG.log.notice('Successfully saved LEVEL DATA.');
 	}
 
 	/**
@@ -965,6 +965,6 @@ class ChartingState extends flixel.addons.ui.FlxUIState
 		_file.removeEventListener(Event.CANCEL, onSaveCancel);
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 		_file = null;
-		FlxG.log.error("Problem saving Level data");
+		FlxG.log.error('Problem saving Level data');
 	}
 }

@@ -20,7 +20,6 @@ typedef SwagSong =
 	var gfVersion:String;
 	var noteStyle:String;
 	var stage:String;
-	var validScore:Bool;
 }
 
 class Song
@@ -49,10 +48,10 @@ class Song
 		trace(jsonInput);
 
 		// pre lowercasing the folder name
-		var folderLowercase = StringTools.replace(folder, " ", "-").toLowerCase();
+		var folderLowercase = StringTools.replace(folder, ' ', '-').toLowerCase();
 		var rawJson = Assets.getText(Paths.json('songs/' + folderLowercase + '/' + jsonInput.toLowerCase())).trim();
 
-		while (!rawJson.endsWith("}")) {
+		while (!rawJson.endsWith('}')) {
 			rawJson = rawJson.substr(0, rawJson.length - 1);
 			// LOL GOING THROUGH THE BULLSHIT TO CLEAN IDK WHATS STRANGE
 		}
@@ -65,7 +64,6 @@ class Song
 	public static function parseJSONshit(rawJson:String):SwagSong
 	{
 		var swagShit:SwagSong = cast Json.parse(rawJson).song;
-		swagShit.validScore = true;
 		return swagShit;
 	}
 }

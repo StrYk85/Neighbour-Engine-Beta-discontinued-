@@ -20,7 +20,7 @@ class Note extends flixel.FlxSprite {
 
 	public var noteScore:Float = 1;
 	public var noteScale:Float = 1;
-	public var rating:String = "shit";
+	public var rating:String = 'shit';
 
 	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inCharter:Bool = false) {
 		super();

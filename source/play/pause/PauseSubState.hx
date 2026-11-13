@@ -17,8 +17,7 @@ import flixel.util.FlxColor;
 import ui.DefaultText;
 import ui.Alphabet;
 
-class PauseSubState extends ui.MusicBeatSubstate
-{
+class PauseSubState extends ui.MusicBeatSubstate {
 	var grpMenuShit:FlxTypedGroup<Alphabet>;
 
 	var menuItems:Array<String> = ['Resume', 'Restart Song', 'Exit to menu'];
@@ -29,8 +28,7 @@ class PauseSubState extends ui.MusicBeatSubstate
 	
 	var offsetChanged:Bool = false;
 
-	public function new()
-	{
+	public function new() {
 		super();
 
 		pauseMusic = new FlxSound().loadEmbedded(Paths.music('breakfast'), true, true);
@@ -45,22 +43,9 @@ class PauseSubState extends ui.MusicBeatSubstate
 		bg.scrollFactor.set();
 		add(bg);
 
-		var levelInfo:FlxText = new FlxText(20, 15, 0, "", 32);
-		levelInfo.text += PlayState.SONG.song;
-		levelInfo.scrollFactor.set();
-		levelInfo.setFormat(Paths.font("vcr.ttf"), 32);
-		levelInfo.updateHitbox();
-		add(levelInfo);
-
-		var levelDifficulty:FlxText = new FlxText(20, 15 + 32, 0, "", 32);
-		levelDifficulty.text += CoolUtil.difficultyFromInt(PlayState.storyDifficulty).toUpperCase();
-		levelDifficulty.scrollFactor.set();
-		levelDifficulty.setFormat(Paths.font('vcr.ttf'), 32);
-		levelDifficulty.updateHitbox();
-		add(levelDifficulty);
-
-		levelDifficulty.alpha = 0;
-		levelInfo.alpha = 0;
+		var levelInfo:FlxText = new FlxText(20, 15, 0, PlayState.SONG.song, 32).setFormat(Paths.font('vcr.ttf'), 32);
+		var levelDifficulty:FlxText = new FlxText(20, 15 + 32, 0, CoolUtil.difficultyFromInt(PlayState.curDifficulty).toUpperCase(), 32).setFormat(Paths.font('vcr.ttf'), 32);
+		for (i in [levelInfo, levelDifficulty]) {i.scrollFactor.set(); i.updateHitbox(); i.alpha = 0; add(i);}
 
 		levelInfo.x = FlxG.width - (levelInfo.width + 20);
 		levelDifficulty.x = FlxG.width - (levelDifficulty.width + 20);
@@ -73,7 +58,7 @@ class PauseSubState extends ui.MusicBeatSubstate
 		add(grpMenuShit);
 		
 		#if cpp
-			perSongOffset = new DefaultText(5, FlxG.height - 18, "Additive Offset (Left, Right): " + PlayState.songOffset + " - Description - " + 'Adds value to global offset, per song.');
+			perSongOffset = new DefaultText(5, FlxG.height - 18, 'Additive Offset (Left, Right): ' + PlayState.songOffset + ' - Description - ' + 'Adds value to global offset, per song.');
 			perSongOffset.scrollFactor.set();
 			add(perSongOffset);
 		#end
@@ -115,11 +100,11 @@ class PauseSubState extends ui.MusicBeatSubstate
 			oldOffset = PlayState.songOffset;
 			PlayState.songOffset += leftP? -1 : 1;
 			// pre lowercasing the song name (not on update)
-			var songLowercase = StringTools.replace(PlayState.SONG.song, " ", "-").toLowerCase();
+			var songLowercase = StringTools.replace(PlayState.SONG.song, ' ', '-').toLowerCase();
 			var songPath = 'assets/data/songs/' + songLowercase + '/';
 
 			sys.FileSystem.rename(songPath + oldOffset + '.offset', songPath + PlayState.songOffset + '.offset');
-			perSongOffset.text = "Additive Offset (Left, Right): " + PlayState.songOffset + " - Description - " + 'Adds value to global offset, per song.';
+			perSongOffset.text = 'Additive Offset (Left, Right): ' + PlayState.songOffset + ' - Description - ' + 'Adds value to global offset, per song.';
 
 			// Prevent loop from happening every single time the offset changes
 			if (!offsetChanged) {
@@ -141,11 +126,11 @@ class PauseSubState extends ui.MusicBeatSubstate
 
 		if (accepted) {
 			switch (menuItems[curSelected]) {
-				case "Resume":
+				case 'Resume':
 					close();
-				case "Restart Song":
+				case 'Restart Song':
 					FlxG.resetState();
-				case "Exit to menu":
+				case 'Exit to menu':
 					if (FlxG.save.data.fpsCap > 290) (cast (Lib.current.getChildAt(0), Main)).setFPSCap(290);
 					FlxG.switchState(new states.MainMenuState());
 			}

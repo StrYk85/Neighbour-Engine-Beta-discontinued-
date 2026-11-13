@@ -45,6 +45,13 @@ class HealthBar extends flixel.group.FlxSpriteGroup {
         add(txt);
     }
 
+    public function bopIcons() {
+        for (icon in [iconP1, iconP2]) {
+			icon.setGraphicSize(Std.int(icon.width + 30));
+			icon.updateHitbox();
+		}
+    }
+
     override function update(elapsed:Float) {
         txt.x = Std.int(barBG.x + (barBG.width - txt.width) / 2);
 

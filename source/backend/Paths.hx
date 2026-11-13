@@ -93,8 +93,8 @@ class Paths {
 		Assets.cache.clear(soundKey);
 	}
 
-	static public function getLibraryPath(file:String, library = "preload") {
-		return if (library == "preload" || library == "default") getPreloadPath(file); else getLibraryPathForce(file, library);
+	static public function getLibraryPath(file:String, library = 'preload') {
+		return if (library == 'preload' || library == 'default') getPreloadPath(file); else getLibraryPathForce(file, library);
 	}
 
 	inline static function getLibraryPathForce(file:String, library:String) {
@@ -143,12 +143,12 @@ class Paths {
 	}
 
 	inline static public function voices(song:String) {
-		var songLowercase = StringTools.replace(song, " ", "-").toLowerCase();
+		var songLowercase = StringTools.replace(song, ' ', '-').toLowerCase();
 		return getPath('audio/songs/${songLowercase}/Voices.${Defaults.SOUND_EXT}', SOUND);
 	}
 
 	inline static public function inst(song:String) {
-		var songLowercase = StringTools.replace(song, " ", "-").toLowerCase();
+		var songLowercase = StringTools.replace(song, ' ', '-').toLowerCase();
 		return getPath('audio/songs/${songLowercase}/Inst.${Defaults.SOUND_EXT}', SOUND);
 	}
 
