@@ -1,13 +1,17 @@
 package play.ui;
+
 import flixel.FlxSprite;
 
 class HealthIcon extends FlxSprite {
 	public var sprTracker:FlxSprite;
+	public var isPlayer:Bool = false;
+	public var percent:Float = 50;
 
 	public function new(char:String = 'bf', isPlayer:Bool = false) {
 		super();
-		this.loadGraphic(Paths.image('icons/$char'), true, 150, 150);
+		this.loadGraphic(Paths.image('characters/icons/$char'), true, 150, 150);
 		this.scrollFactor.set();
+		this.isPlayer = isPlayer;
 		this.flipX = isPlayer;
 
 		antialiasing = true;
@@ -19,5 +23,6 @@ class HealthIcon extends FlxSprite {
 	override function update(elapsed:Float) {
 		super.update(elapsed);
 		if (sprTracker != null) setPosition(sprTracker.x + sprTracker.width + 10, sprTracker.y - 30);
+		animation.play(isPlayer? (percent < 20? 'lose' : 'win') : (percent > 80? 'lose' : 'win'));
 	}
 }

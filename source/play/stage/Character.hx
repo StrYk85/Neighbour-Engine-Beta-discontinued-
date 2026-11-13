@@ -2,14 +2,9 @@ package play.stage;
 
 import haxe.Json;
 import lime.utils.Assets;
-import flixel.util.FlxStringUtil;
-import flixel.util.FlxColor;
-import play.stage.StageSetup.AnimationData;
+import backend.AnimationData;
 
-using StringTools;
-
-class Character extends graphics.FunkinSprite {
-	public var animOffsets:Map<String, Array<Dynamic>> = new Map<String, Array<Dynamic>>();
+class Character extends Bopper {
 	public var cameraOffsets:Array<Float> = [0, 0];
 	public var stageOffsets:Array<Float> = [0, 0];
 
@@ -24,46 +19,32 @@ class Character extends graphics.FunkinSprite {
 	public var holdTimer:Float = 0;
 	public var singTime:Float = 4;
 
-	public var debugMode:Bool = false;
-
-	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false) {
+	public function new(x:Float, y:Float, ?character:String = 'bf', ?isPlayer:Bool = false) {
 		super(x, y, character);
 		curCharacter = character;
 		this.isPlayer = isPlayer;
 
 		if (!openfl.utils.Assets.exists(Paths.json('characters/' + curCharacter))) curCharacter = 'bf';
-		var rawJson = Assets.getText(Paths.json('characters/' + curCharacter));
-		var daJson = Json.parse(rawJson);
+		var daJson = Json.parse(Assets.getText(Paths.json('characters/' + curCharacter)));
 
-		frames = Paths.getSparrowAtlas(daJson.assetPath);
+		loadSparrow(daJson.assetPath);
 		var animations:Array<AnimationData> = daJson.animations;
 
 		for (anim in animations) {
 			if (anim.name == 'danceLeft' || anim.name == 'danceRight') shouldAlternate = true;
-
-			if (anim.indices != null) animation.addByIndices(anim.name, anim.prefix, anim.indices, '', anim.framerate ?? 24, anim.loop ?? false);
-			else animation.addByPrefix(anim.name, anim.prefix, anim.framerate ?? 24, anim.loop ?? false);
-			if (anim.offsets != null) addOffset(anim.name, anim.offsets[0] ?? 0.0, anim.offsets[1] ?? 0.0);
-			else addOffset(anim.name, 0, 0);
-
-			if (anim.loopIndices != null) {
-				animation.addByIndices(anim.name + '-loop', anim.prefix, anim.loopIndices, '', anim.framerate ?? 24, true);
-				animOffsets[anim.name + '-loop'] = animOffsets[anim.name];
-			}
+			addAnimation(anim.name, anim.prefix, anim.indices, anim.offsets, anim.framerate, anim.loop);
+			if (anim.loopIndices != null) addAnimation('${anim.name}-loop', anim.prefix, anim.loopIndices, anim.offsets, anim.framerate, anim.loop);
 		}
 
 		var camOffs:Array<Float> = isPlayer? daJson.playerCameraOffsets : daJson.cameraOffsets;
+		if (camOffs != null) cameraOffsets = [camOffs[0] ?? 0, camOffs[1] ?? 0];
+
 		var stageOffs:Array<Float> = isPlayer? daJson.playerOffsets : daJson.offsets;
-
-		if (camOffs != null) 
-			cameraOffsets = [camOffs[0] ?? 0, camOffs[1] ?? 0];
-
-		if (stageOffs != null) 
-			stageOffsets = [stageOffs[0] ?? 0, stageOffs[1] ?? 0];
+		if (stageOffs != null) stageOffsets = [stageOffs[0] ?? 0, stageOffs[1] ?? 0];
 
 		flipX = daJson.flipX ?? false;
 		antialiasing = daJson.antialiasing ?? true;
-		noteStyle = daJson.noteStyle ?? 'default';
+		noteStyle = daJson.noteStyle ?? 'default'; // why did i add this?
 		charIcon = daJson.icon ?? curCharacter;
 		iconColor = daJson.iconColor;
 
@@ -72,13 +53,13 @@ class Character extends graphics.FunkinSprite {
 			forcedPlayer = true;
 		}
 
-		animation.onFinish.add(function(animName:String) if (animation.exists(animName + '-loop')) playAnim(animName + '-loop', true, false, 0));
-		playAnim(shouldAlternate? 'danceRight' : 'idle', true);
+		animation.onFinish.add(function(animName:String) if (animationExists(animName + '-loop')) playAnimation(animName + '-loop', true, false, 0));
+		playAnimation(shouldAlternate? 'danceRight' : 'idle', true);
 	}
 
 	override function update(elapsed:Float) {
-		if (!debugMode) {
-			if (animation.curAnim.name.startsWith('sing')) holdTimer += elapsed;
+		if (logicUpdate) {
+			if (isSinging()) holdTimer += elapsed;
 			else if (isPlayer) holdTimer = 0;
 
 			if (!isPlayer && holdTimer >= (Conductor.stepCrochet / 1000) * singTime) {
@@ -87,10 +68,6 @@ class Character extends graphics.FunkinSprite {
 			}
 		}
 		super.update(elapsed);
-	}
-
-	override function dance() {
-		if (!debugMode) super.dance();
 	}
 
 	public function taunt():Void {
@@ -109,31 +86,20 @@ class Character extends graphics.FunkinSprite {
 		playAnim(animToPlay, true);
 	}
 
-	public function sing(direction:Int, miss:Bool = false, reversed:Bool = false, frame:Int = 0):Void {
-		var noteDirections = backend.Defaults.NOTE_DIRECTIONS;
+	public function singDirection(direction:Int, miss:Bool = false, reversed:Bool = false, frame:Int = 0):Void {
+		var noteDirections = forcedPlayer? backend.Defaults.NOTE_DIRECTIONS_SWAP : backend.Defaults.NOTE_DIRECTIONS;
 		var directionToSing = noteDirections[direction].toUpperCase();
-		if (forcedPlayer) {
-			switch (directionToSing) {
-				case 'LEFT': directionToSing = 'RIGHT';
-				case 'RIGHT': directionToSing = 'LEFT';
-			}
-		}
+		
 		if (miss && animation.exists('sing${directionToSing}miss')) directionToSing += 'miss';
 		playAnim('sing$directionToSing', true, reversed, frame);
 		holdTimer = 0;
 	}
 
-	override function playAnim(animationName:String, force:Bool = false, reversed:Bool = false, frame:Int = 0):Void {
-		super.playAnim(animationName, force, reversed, frame);
-
-		var daOffset = animOffsets.get(animationName);
-		if (animOffsets.exists(animationName))
-			offset.set(daOffset[0], daOffset[1])
-		else 
-			offset.set();
+	public function sing(direction:Int, miss:Bool = false, reversed:Bool = false, frame:Int = 0):Void {
+		singDirection(direction, miss, reversed, frame);
 	}
 
-	public function addOffset(name:String, x:Float = 0, y:Float = 0) {
-		animOffsets[name] = [x, y];
+	public function isSinging():Bool {
+		return animationStartsWith('sing');
 	}
 }

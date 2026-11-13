@@ -23,8 +23,8 @@ class Paths {
 
 	public static var dumpExclusions:Array<String> =
 	[
-		'assets/music/freakyMenu.${Defaults.SOUND_EXT}',
-		'assets/shared/music/breakfast.${Defaults.SOUND_EXT}',
+		'assets/audio/music/freakyMenu.${Defaults.SOUND_EXT}',
+		'assets/audio/music/breakfast.${Defaults.SOUND_EXT}',
 	];
 
 	public static function excludeAsset(key:String) {
@@ -73,8 +73,8 @@ class Paths {
 		localTrackedAssets.resize(0);
 
 		#if !html5 
-		Assets.cache.clear('songs'); 
-		Assets.cache.clear('music'); 
+		Assets.cache.clear('audio/songs'); 
+		Assets.cache.clear('audio/music'); 
 		#end
 	}
 
@@ -123,7 +123,7 @@ class Paths {
 
 	static public function sound(key:String, ?library:String) {
 		//return getPath('sounds/$key.$SOUND_EXT', SOUND, library);
-		var daPath = getPath('sounds/$key.${Defaults.SOUND_EXT}', SOUND, library);
+		var daPath = getPath('audio/sounds/$key.${Defaults.SOUND_EXT}', SOUND, library);
 
 		if (!currentTrackedSounds.exists(daPath)) {
 			var sound:Null<Sound> = Assets.getSound(daPath, true);
@@ -139,17 +139,17 @@ class Paths {
 	}
 
 	inline static public function music(key:String, ?library:String) {
-		return getPath('music/$key.${Defaults.SOUND_EXT}', MUSIC, library);
+		return getPath('audio/music/$key.${Defaults.SOUND_EXT}', MUSIC, library);
 	}
 
 	inline static public function voices(song:String) {
 		var songLowercase = StringTools.replace(song, " ", "-").toLowerCase();
-		return getPath('songs/${songLowercase}/Voices.${Defaults.SOUND_EXT}', SOUND);
+		return getPath('audio/songs/${songLowercase}/Voices.${Defaults.SOUND_EXT}', SOUND);
 	}
 
 	inline static public function inst(song:String) {
 		var songLowercase = StringTools.replace(song, " ", "-").toLowerCase();
-		return getPath('songs/${songLowercase}/Inst.${Defaults.SOUND_EXT}', SOUND);
+		return getPath('audio/songs/${songLowercase}/Inst.${Defaults.SOUND_EXT}', SOUND);
 	}
 
 	inline static public function image(key:String, ?library:String) {

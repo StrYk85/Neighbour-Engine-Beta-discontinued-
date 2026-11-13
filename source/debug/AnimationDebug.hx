@@ -33,9 +33,9 @@ class AnimationDebug extends ui.MusicBeatState
 
 		char = new Character(0, 0, daAnim);
 		char.screenCenter();
-		char.debugMode = true;
-		add(char);
+		char.logicUpdate = false;
 		char.flipX = false;
+		add(char);
 		trace('added ' + '"'+daAnim+'"');
 
 		dumbTexts = new FlxTypedGroup<FlxText>();

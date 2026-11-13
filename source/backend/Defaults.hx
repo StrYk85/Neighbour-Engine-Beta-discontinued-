@@ -10,10 +10,11 @@ class Defaults {
 
     inline public static var OPPONENT_COLOR:FlxColor = 0xFFFF0000;
     inline public static var PLAYER_COLOR:FlxColor = 0xFF66FF33;
-
-    inline public static var MISS_COLOR = 0xFF565694;
+    inline public static var DEFAULT_ICON_ID:String = 'default';
+	inline public static var DEFAULT_ICON_OFFSET:Float = 26.0;
 
     public static var NOTE_DIRECTIONS:Array<String> = ['Left', 'Down', 'Up', 'Right'];
+	public static var NOTE_DIRECTIONS_SWAP:Array<String> = ['Right', 'Down', 'Up', 'Left'];
     public static var NOTE_COLOR_NAMES:Array<String> = ['Purple', 'Blue', 'Green', 'Red'];
     public static var NOTE_COLORS:Array<FlxColor> = [0xFFC24B99, 0xFF00FFFF, 0xFF12FA05, 0xFFF9393F];
 	public static var difficultyArray:Array<String> = ['Easy', 'Normal', 'Hard'];

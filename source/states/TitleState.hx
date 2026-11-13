@@ -1,6 +1,7 @@
 package states;
 
 import graphics.FunkinSprite;
+import play.stage.Bopper;
 import flixel.addons.transition.FlxTransitionSprite.GraphicTransTileDiamond;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.addons.transition.TransitionData;
@@ -29,10 +30,8 @@ class TitleState extends ui.MusicBeatState
 
 	function setData() {
 		FlxG.save.bind('neighbour_engine', 'stryk85');
-		
-		backend.PlayerSettings.init();
+
 		backend.utils.DataUtil.initSave();
-		backend.Highscore.load();
 	}
 
 	override public function create():Void {
@@ -53,7 +52,7 @@ class TitleState extends ui.MusicBeatState
 	}
 
 	var logoBl:FunkinSprite;
-	var gfDance:FunkinSprite;
+	var gfDance:Bopper;
 	var danceLeft:Bool = false;
 	var titleText:FunkinSprite;
 
@@ -91,7 +90,7 @@ class TitleState extends ui.MusicBeatState
 		logoBl.animation.play('bump');
 		logoBl.updateHitbox();
 
-		gfDance = new FunkinSprite(FlxG.width * 0.4, FlxG.height * 0.07);
+		gfDance = new Bopper(FlxG.width * 0.4, FlxG.height * 0.07);
 		gfDance.shouldAlternate = true;
 		gfDance.frames = Paths.getSparrowAtlas('titlescreen/gfDanceTitle');
 		gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);

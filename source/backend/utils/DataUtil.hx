@@ -37,12 +37,11 @@ class DataUtil
 		if (FlxG.save.data.optimize == null) FlxG.save.data.optimize = false;
 		
 		var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
-		
 		KeyBinds.gamepad = gamepad != null;
 
 		play.Conductor.recalculateTimings();
-		PlayerSettings.player1.controls.loadKeyBinds();
-		KeyBinds.keyCheck();
+		PlayerSettings.init();
+		Highscore.load();
 
 		Main.watermarks = FlxG.save.data.watermark;
 

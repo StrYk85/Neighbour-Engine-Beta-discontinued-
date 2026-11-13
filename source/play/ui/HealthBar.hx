@@ -1,20 +1,12 @@
 package play.ui;
 
-import flixel.group.FlxSpriteGroup;
-import flixel.text.FlxText;
 import flixel.FlxSprite;
 import flixel.ui.FlxBar;
 import flixel.util.FlxColor;
 import flixel.math.FlxMath;
 import ui.DefaultText;
 
-class HealthBar extends FlxSpriteGroup {
-
-    private var iconOffset:Int = 26;
-    private var defaultIcon:String = 'face';
-
-    public var thisValue:Float;
-
+class HealthBar extends flixel.group.FlxSpriteGroup {
     public var barBG:FlxSprite;
 	public var bar:FlxBar;
     public var txt:DefaultText;
@@ -38,11 +30,11 @@ class HealthBar extends FlxSpriteGroup {
 		add(bar);
         add(barBG);
 
-        iconP1 = new HealthIcon(info.iconP1 ?? defaultIcon, !reversed);
+        iconP1 = new HealthIcon(info.iconP1 ?? backend.Defaults.DEFAULT_ICON_ID, !reversed);
 		iconP1.y = bar.y - (iconP1.height / 2);
 		add(iconP1);
 
-		iconP2 = new HealthIcon(info.iconP2 ?? defaultIcon, reversed);
+		iconP2 = new HealthIcon(info.iconP2 ?? backend.Defaults.DEFAULT_ICON_ID, reversed);
 		iconP2.y = bar.y - (iconP2.height / 2);
 		add(iconP2);
 
@@ -56,18 +48,17 @@ class HealthBar extends FlxSpriteGroup {
     override function update(elapsed:Float) {
         txt.x = Std.int(barBG.x + (barBG.width - txt.width) / 2);
 
-        for (icon in [iconP1,iconP2]) {
-            icon.setGraphicSize(Std.int(FlxMath.lerp(150, icon.width, 0.75)));
+        for (icon in [iconP1, iconP2]) {
+            icon.setGraphicSize(FlxMath.lerp(150, icon.width, 0.75));
             icon.updateHitbox();
             
-            var offsetSHIT:Float = icon.animation.curAnim.flipX? iconOffset : icon.width - iconOffset;
-            icon.x = bar.x + (bar.width * (FlxMath.remapToRange(bar.percent, 0, 100, bar.flipX? 0 : 100, bar.flipX? 100 : 0) * 0.01) - offsetSHIT);
+            var iconOffset = backend.Defaults.DEFAULT_ICON_OFFSET;
+            var offsetSHIT:Float = icon.isPlayer? iconOffset : icon.width - iconOffset;
+            icon.x = bar.x + bar.width * (FlxMath.remapToRange(bar.percent, 0, 100, bar.flipX? 0 : 100, bar.flipX? 100 : 0) * 0.01) - offsetSHIT;
             icon.y = bar.y + (bar.height - icon.height) / 2;
+
+            icon.percent = bar.percent;
         }
-
-		iconP1.animation.curAnim.curFrame = bar.percent < 20? 1 : 0;
-		iconP2.animation.curAnim.curFrame = bar.percent > 80? 1 : 0;
-
         super.update(elapsed);
     }
 }

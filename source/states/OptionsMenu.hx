@@ -69,7 +69,7 @@ class OptionsMenu extends ui.MusicBeatState
 	{
 		instance = this;
 		var menuBG:FunkinSprite = new FunkinSprite();
-		menuBG.loadGraphic(Paths.image("menuDesat"));
+		menuBG.loadGraphic(Paths.image('mainmenu/menuDesat'));
 
 		menuBG.color = 0xFFea71fd;
 		menuBG.setGraphicSize(Std.int(menuBG.width * 1.1));

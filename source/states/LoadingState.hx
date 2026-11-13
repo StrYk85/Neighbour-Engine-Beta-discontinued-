@@ -5,6 +5,7 @@ import lime.app.Future;
 import flixel.FlxG;
 import flixel.FlxState;
 import graphics.FunkinSprite;
+import play.stage.Bopper;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.util.FlxTimer;
 
@@ -25,7 +26,7 @@ class LoadingState extends ui.MusicBeatState
 	var callbacks:MultiCallback;
 	
 	var logo:FunkinSprite;
-	var gfDance:FunkinSprite;
+	var gfDance:Bopper;
 	var danceLeft = false;
 	
 	function new(target:FlxState, stopMusic:Bool)
@@ -44,7 +45,7 @@ class LoadingState extends ui.MusicBeatState
 		logo.animation.play('bump');
 		logo.updateHitbox();
 
-		gfDance = new FunkinSprite(FlxG.width * 0.4, FlxG.height * 0.07);
+		gfDance = new Bopper(FlxG.width * 0.4, FlxG.height * 0.07);
 		gfDance.shouldAlternate = true;
 		gfDance.frames = Paths.getSparrowAtlas('gfDanceTitle');
 		gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);

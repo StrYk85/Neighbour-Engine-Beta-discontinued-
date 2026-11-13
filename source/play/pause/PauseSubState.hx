@@ -29,7 +29,7 @@ class PauseSubState extends ui.MusicBeatSubstate
 	
 	var offsetChanged:Bool = false;
 
-	public function new(x:Float, y:Float)
+	public function new()
 	{
 		super();
 

@@ -4,72 +4,88 @@ import flixel.FlxSprite;
 import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
-import flixel.util.FlxColor;
-import flixel.group.FlxSpriteGroup;
-import flixel.group.FlxSpriteGroup.FlxTypedSpriteGroup;
 
-class RatingPopup extends FlxSpriteGroup {
-
+class RatingPopup extends flixel.group.FlxSpriteGroup {
     public var pathPrefix:String = '';
     public var pathSuffix:String = '';
 
-    public var rating:FlxSprite;
-    public var msTxt:FlxText;
-    public var numbers:FlxTypedSpriteGroup<FlxSprite> = new FlxTypedSpriteGroup<FlxSprite>();
+    public var spriteBin:Map<String, Array<FlxSprite>> = [];
 
     public function new(pathPrefix:String, pathSuffix:String) {
         super();
-
         this.pathPrefix = 'notestyles/$pathPrefix';
         this.pathSuffix = pathSuffix;
+    }
 
-        rating = new FlxSprite().loadGraphic(Paths.image(pathPrefix + 'sick' + pathSuffix));
-        rating.scrollFactor.set();
-        rating.alpha = 0.001;
-        rating.scale.set(0.7, 0.7);
-        add(rating);
+     override public function destroy():Void {
+        super.destroy();
+        for (pool in spriteBin) for (sprite in pool) sprite.destroy();
+        spriteBin.clear();
+    }
 
-        msTxt = new FlxText(0, 0, 0, '0ms', 20);
-        msTxt.borderStyle = OUTLINE;
-		msTxt.borderSize = 1;
-		msTxt.borderColor = 0xFF000000;
-        msTxt.scrollFactor.set();
-        msTxt.alpha = 0.001;
-        add(msTxt);
+    public function getSprite(key:String = 'good', spritescale:Float = 0.7):FlxSprite {
+        var bin = spriteBin.get(key);
+        if (bin != null && bin.length > 0) {
+            var sprite = bin.pop();
+            sprite.acceleration.set();
+            sprite.velocity.set();
+            sprite.alpha = 1;
+            return sprite;
+        }
+        if (bin == null) spriteBin.set(key, []);
+        return createSprite(key, spritescale);
+    }
+
+    public function putSprite(key:String = 'good', sprite:FlxSprite) {
+        var bin = spriteBin.get(key);
+        if (bin == null) spriteBin.set(key, []);
+        remove(sprite, true);
+        bin.push(sprite);
+    }
+
+    public function createSprite(key:String = 'good', spritescale:Float = 0.7):FlxSprite {
+        var dummy:FlxSprite = new FlxSprite().loadGraphic(Paths.image(pathPrefix + key + pathSuffix));
+        dummy.antialiasing = true;
+        dummy.scrollFactor.set();
+        dummy.scale.set(spritescale, spritescale);
+        dummy.updateHitbox();
+        return dummy;
     }
 
     public function displayRating(totalRating:String) {
         if (totalRating == null) totalRating = 'good';
 
-        rating.acceleration.set();
-        rating.velocity.set();
-        FlxTween.cancelTweensOf(rating);
-        rating.alpha = 1;
-        rating.active = true;
-
-        rating.loadGraphic(Paths.image(pathPrefix + totalRating + pathSuffix));
-        rating.setPosition(Std.int(this.x), Std.int(this.y));
+        var rating = getSprite(totalRating, 0.7);
+        if (rating == null) return;
+        rating.setPosition(-rating.width/2, -rating.height/2);
+        add(rating);
 
         rating.acceleration.y = 550;
-        rating.velocity.y -= FlxG.random.int(140, 175);
-        rating.velocity.x -= FlxG.random.int(0, 10);
+        rating.velocity.set(-FlxG.random.int(0, 10), -FlxG.random.int(140, 175));
 
-        FlxTween.tween(rating, {alpha: 0.001}, 0.2, {onComplete: function(tween:FlxTween) {rating.active = false;}, startDelay: play.Conductor.crochet * 0.001});
+        FlxTween.tween(rating, {alpha: 0}, 0.2, {onComplete: function(tween:FlxTween) putSprite(totalRating, rating), startDelay: play.Conductor.crochet * 0.001});
+    }
+    
+    public function displayNum(combo:Int = 0) {
+        var comboString = Std.string(combo);
+        while (comboString.length < 3) comboString = flixel.util.FlxStringUtil.insert(comboString, 0, '0');
+
+        for (i in 0...comboString.length) {
+            var name = 'num${comboString.charAt(i)}';
+            var num = getSprite(name, 0.5);
+            if (num == null) return;
+            num.setPosition(-num.width/2 + (i * 45), -num.height/2 + 75);
+            add(num);
+
+            num.acceleration.y = FlxG.random.int(250, 300);
+            num.velocity.set(FlxG.random.int(-5, 5), -FlxG.random.int(130, 150));
+
+            FlxTween.tween(num, {alpha: 0}, 0.2, {onComplete: function(tween:FlxTween) putSprite(name, num), startDelay: play.Conductor.crochet * 0.002});
+        }
     }
 
-    public function displayMS(combo:Int, msShit:Float, totalRating:String) {
-        if (totalRating == null) totalRating = 'good';
-
-        FlxTween.cancelTweensOf(msTxt);
-        msTxt.alpha = 1;
-        msTxt.active = true;
-
-        msTxt.text = 'Combo: ' + combo + ' | ' + msShit + 'ms';
-        msTxt.color = totalRating == 'sick'? FlxColor.CYAN : totalRating == 'good'? FlxColor.GREEN : FlxColor.RED;
-
-        msTxt.x = Std.int(rating.x + 100);
-		msTxt.y = Std.int(rating.y + 125);
-
-        FlxTween.tween(msTxt, {alpha: 0.001}, 0.2, {onComplete: function(tween:FlxTween) {msTxt.active = false;}, startDelay: play.Conductor.crochet * 0.001});
+    public function displayFull(rating:String, combo:Int, forceCombo:Bool = false) {
+        displayRating(rating);
+        if (combo >= 10 || forceCombo) displayNum(combo);
     }
 }

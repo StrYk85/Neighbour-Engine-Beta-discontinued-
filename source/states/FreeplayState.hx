@@ -15,11 +15,8 @@ import backend.Highscore;
 
 using StringTools;
 
-class FreeplayState extends ui.MusicBeatState
-{
+class FreeplayState extends ui.MusicBeatState {
 	var songs:Array<SongMetadata> = [];
-
-	var selector:FlxText;
 	var curSelected:Int = 0;
 	var curDifficulty:Int = 1;
 
@@ -35,8 +32,7 @@ class FreeplayState extends ui.MusicBeatState
 
 	private var iconArray:Array<HealthIcon> = [];
 
-	override function create()
-	{
+	override function create() {
 		var initSonglist = CoolUtil.coolTextFile(Paths.txt('songs/freeplaySonglist'));
 
 		for (i in 0...initSonglist.length) {
@@ -51,8 +47,7 @@ class FreeplayState extends ui.MusicBeatState
 		grpSongs = new FlxTypedGroup<Alphabet>();
 		add(grpSongs);
 
-		for (i in 0...songs.length)
-		{
+		for (i in 0...songs.length) {
 			var songText:Alphabet = new Alphabet(0, (70 * i) + 30, songs[i].songName, true, false);
 			songText.isMenuItem = true;
 			songText.targetY = i;
