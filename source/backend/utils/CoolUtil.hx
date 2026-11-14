@@ -25,12 +25,4 @@ class CoolUtil {
 		for (i in min...max) dumbArray.push(i);
 		return dumbArray;
 	}
-
-	public static function fancyOpenURL(schmancy:String) {
-		#if linux
-		Sys.command('/usr/bin/xdg-open', [schmancy, "&"]);
-		#else
-		FlxG.openURL(schmancy);
-		#end
-	}
 }

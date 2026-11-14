@@ -11,13 +11,13 @@ class Bopper extends graphics.FunkinSprite {
         this.name ??= name;
     }
 
-    public function dance() {
+    public function dance(force:Bool = false) {
         if (!logicUpdate) return;
         if (shouldAlternate) {
-            playAnim(alternated? 'danceRight' : 'danceLeft');
+            playAnim(alternated? 'danceRight' : 'danceLeft', force);
             alternated = !alternated;
         }
         else 
-            playAnim('idle');
+            playAnim('idle', force);
     }
 }

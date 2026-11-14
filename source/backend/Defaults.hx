@@ -6,6 +6,7 @@ import openfl.utils.Assets;
 class Defaults {
     inline public static var ENGINE_VERSION:String = 'BETA';
     inline public static var ENGINE_TITLE:String = 'Neighbour Engine';
+	inline public static var WINDOW_TITLE:String = 'Friday Night Funkin\': Neighbour Engine';
 	inline public static var GAME_VERSION:String = '0.2.7.1';
 
     inline public static var OPPONENT_COLOR:FlxColor = 0xFFFF0000;

@@ -30,6 +30,8 @@ class TitleState extends ui.MusicBeatState
 
 	function setData() {
 		FlxG.save.bind('neighbour_engine', 'stryk85');
+		backend.utils.WindowUtil.setupDarkWindow();
+		backend.utils.WindowUtil.resetWindowTitle();
 
 		backend.utils.DataUtil.initSave();
 	}

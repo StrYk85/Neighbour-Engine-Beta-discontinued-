@@ -60,14 +60,16 @@ class Character extends Bopper {
 	override function update(elapsed:Float) {
 		if (logicUpdate) {
 			if (isSinging()) holdTimer += elapsed;
-			else if (isPlayer) holdTimer = 0;
-
-			if (!isPlayer && holdTimer >= (Conductor.stepCrochet / 1000) * singTime) {
-				dance();
-				holdTimer = 0;
-			}
+			if (!isPlayer && holdTimer >= (Conductor.stepCrochet / 1000) * singTime) dance(true);
 		}
 		super.update(elapsed);
+	}
+
+	override public function dance(force:Bool = false) {
+		if (!isSinging() || force) {
+			super.dance(force);
+			holdTimer = 0;
+		}
 	}
 
 	public function taunt():Void {

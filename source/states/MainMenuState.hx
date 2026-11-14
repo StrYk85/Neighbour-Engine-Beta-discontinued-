@@ -108,7 +108,7 @@ class MainMenuState extends ui.MusicBeatState {
 			case 'options':
 				toState(new OptionsMenu());
 			case 'donate':
-				CoolUtil.fancyOpenURL('https://ninja-muffin24.itch.io/funkin');
+				backend.utils.WindowUtil.fancyOpenURL('https://ninja-muffin24.itch.io/funkin');
 				canInteract = true;
 			default: 
 				canInteract = true;

@@ -39,6 +39,7 @@
 	<haxelib name="flixel-addons" />
 	<haxelib name="flixel-ui" />
 	<haxelib name="hscript" />
+	<haxelib name="hxWindowColorMode"/>
 	<!-- <haxelib name="hxvlc" if="desktop || android" /> -->
 	<!-- <haxelib name="faxe" if='switch'/> -->
 

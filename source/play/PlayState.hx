@@ -75,8 +75,6 @@ class PlayState extends ui.MusicBeatState {
 	public var ratingMap:StringMap<Int> = new StringMap();
 	private var ratingGroup:RatingPopup;
 
-	public static var campaignMisses:Int = 0;
-
 	public var accuracy:Float = 0;
 	private var totalNotesHit:Int = 0;
 	
@@ -146,10 +144,7 @@ class PlayState extends ui.MusicBeatState {
 		healthBar.cameras = [camHUD];
 		add(healthBar);
 
-		var pixelShitPart1:String = 'default/popup/';
-		var pixelShitPart2:String = '';
-
-		ratingGroup = new RatingPopup(pixelShitPart1, pixelShitPart2);
+		ratingGroup = new RatingPopup('default/popup/', '');
 		ratingGroup.screenCenter();
 		ratingGroup.cameras = [camHUD];
 		add(ratingGroup);
@@ -160,12 +155,11 @@ class PlayState extends ui.MusicBeatState {
 		if (FlxG.sound.music != null) FlxG.sound.music.stop();
 		FlxG.worldBounds.set(0, 0, FlxG.width, FlxG.height);
 		FlxG.fixedTimestep = false;
-		PlayStateChangeables.reset();
+		persistentUpdate = persistentDraw = true;
 
 		for (i in ['sick', 'good', 'bad', 'shit', 'miss']) ratingMap.set(i, 0);
 		combo = 0;
-
-		persistentUpdate = persistentDraw = true;
+		PlayStateChangeables.reset();
 
 		if (SONG == null) SONG = Song.loadFromJson('tutorial', 'tutorial');
 		if (SONG.song == null) trace('song is null???');
@@ -189,11 +183,11 @@ class PlayState extends ui.MusicBeatState {
 		trace('starting');
 
 		startCountdown();
-
 		super.create();
 
 		leftWatermark.cameras = [camHUD];
-		leftWatermark.text = '${SONG.song} (${Defaults.difficultyArray[curDifficulty]}) - ${Defaults.ENGINE_TITLE} ${Defaults.ENGINE_VERSION}'; 
+		leftWatermark.text = '${Defaults.ENGINE_TITLE} ${Defaults.ENGINE_VERSION}';
+		backend.utils.WindowUtil.addToWindowTitle('  -  ${SONG.song} (${Defaults.difficultyArray[curDifficulty]})');
 	}
 
 	private function generateStage():Void {
@@ -508,8 +502,7 @@ class PlayState extends ui.MusicBeatState {
 	}
 
 	function endSong():Void {
-		if (isStoryMode) campaignMisses = ratingMap.get('miss');
-		else {
+		if (!isStoryMode) {
 			PlayStateChangeables.botPlay = false;
 			PlayStateChangeables.scrollSpeed = 1;
 			PlayStateChangeables.useDownscroll = false;
@@ -678,8 +671,8 @@ class PlayState extends ui.MusicBeatState {
 
 		for (i => r in releaseArray) if (r) playerStrums.playStatic(i);
 		
-		if (player != null && player.isSinging() && player.holdTimer > (Conductor.stepCrochet / 1000) * player.singTime && (!holdArray.contains(true) || playerStrums.bot)) {
-			player.dance();
+		if (player != null && player.holdTimer > (Conductor.stepCrochet / 1000) * player.singTime && (!holdArray.contains(true) || playerStrums.bot)) {
+			player.dance(true);
 		}
 	}
 
@@ -700,8 +693,8 @@ class PlayState extends ui.MusicBeatState {
 		var noteDiff:Float = -(note.strumTime - Conductor.songPosition);
 		note.rating = Ratings.calculateRating(noteDiff);
 
-		totalNotesHit++;
 		if (!note.isSustainNote) {
+			totalNotesHit++;
 			combo++;
 			popUpScore(note, noteDiff);
 		}
@@ -759,12 +752,13 @@ class PlayState extends ui.MusicBeatState {
 		}
 
 		if (gf != null && curBeat % gfSpeed == 0) gf.dance();
-		if (player != null && !player.isSinging()) player.dance();
+		if (player != null) player.dance();
 		healthBar.bopIcons();
 	}
 
 	override function destroy() {
 		instance = null;
+		backend.utils.WindowUtil.resetWindowTitle();
 		super.destroy();
 	}
 }
