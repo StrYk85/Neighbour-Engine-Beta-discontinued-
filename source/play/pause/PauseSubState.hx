@@ -1,26 +1,23 @@
 package play.pause;
 
-import flixel.input.gamepad.FlxGamepad;
-import openfl.Lib;
-import backend.Controls.Control;
-import flixel.FlxG;
 import graphics.FunkinSprite;
-import flixel.FlxSubState;
-import flixel.addons.transition.FlxTransitionableState;
+import flixel.input.gamepad.FlxGamepad;
 import flixel.group.FlxGroup.FlxTypedGroup;
-import flixel.input.keyboard.FlxKey;
 import flixel.sound.FlxSound;
 import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
-import flixel.util.FlxColor;
 import ui.DefaultText;
 import ui.Alphabet;
 
+typedef PauseEntry = {
+	var text:String;
+	var callback:() -> Void;
+}
+
 class PauseSubState extends ui.MusicBeatSubstate {
 	var grpMenuShit:FlxTypedGroup<Alphabet>;
-
-	var menuItems:Array<String> = ['Resume', 'Restart Song', 'Exit to menu'];
+	var callBacks:Array<() -> Void> = [];
 	var curSelected:Int = 0;
 
 	var pauseMusic:FlxSound;
@@ -28,24 +25,33 @@ class PauseSubState extends ui.MusicBeatSubstate {
 	
 	var offsetChanged:Bool = false;
 
+	public function setMenuArray():Array<PauseEntry> {
+		var daArray:Array<PauseEntry> = [
+			{text: 'Resume', callback: close},
+			{text: 'Restart Song', callback: () -> FlxG.resetState()},
+			{text: 'Options', callback: goToOptions},
+			{text: 'Exit to Menu', callback: exitToMainMenu},
+		];
+		if (PlayState.inChartingState) daArray.insert(4, {text: 'Exit to Chart Editor', callback: () -> toState(new debug.ChartingState())});
+		return daArray;
+	}
+
 	public function new() {
 		super();
-
 		pauseMusic = new FlxSound().loadEmbedded(Paths.music('breakfast'), true, true);
 		pauseMusic.volume = 0;
 		pauseMusic.play(false, FlxG.random.int(0, Std.int(pauseMusic.length / 2)));
-
 		FlxG.sound.list.add(pauseMusic);
 
 		var bg:FunkinSprite = new FunkinSprite();
-		bg.makeSolid(FlxG.width, FlxG.height, FlxColor.BLACK);
-		bg.alpha = 0;
+		bg.makeSolid(FlxG.width, FlxG.height, 0xFF000000);
 		bg.scrollFactor.set();
+		bg.alpha = 0;
 		add(bg);
 
 		var levelInfo:FlxText = new FlxText(20, 15, 0, PlayState.SONG.song, 32).setFormat(Paths.font('vcr.ttf'), 32);
 		var levelDifficulty:FlxText = new FlxText(20, 15 + 32, 0, CoolUtil.difficultyFromInt(PlayState.curDifficulty).toUpperCase(), 32).setFormat(Paths.font('vcr.ttf'), 32);
-		for (i in [levelInfo, levelDifficulty]) {i.scrollFactor.set(); i.updateHitbox(); i.alpha = 0; add(i);}
+		for (i in [levelInfo, levelDifficulty]) {i.antialiasing = true; i.scrollFactor.set(); i.updateHitbox(); i.alpha = 0; add(i);}
 
 		levelInfo.x = FlxG.width - (levelInfo.width + 20);
 		levelDifficulty.x = FlxG.width - (levelDifficulty.width + 20);
@@ -58,37 +64,45 @@ class PauseSubState extends ui.MusicBeatSubstate {
 		add(grpMenuShit);
 		
 		#if cpp
-			perSongOffset = new DefaultText(5, FlxG.height - 18, 'Additive Offset (Left, Right): ' + PlayState.songOffset + ' - Description - ' + 'Adds value to global offset, per song.');
+			perSongOffset = new DefaultText(5, FlxG.height - 18, '');
+			perSongOffset.text = 'Additive Offset (Left, Right): ' + PlayState.songOffset + ' - Description - ' + 'Adds value to global offset, per song.';
 			perSongOffset.scrollFactor.set();
 			add(perSongOffset);
 		#end
-
+		
+		var menuItems = setMenuArray();
+		var id = 0;
 		for (i in 0...menuItems.length) {
-			var songText:Alphabet = new Alphabet(0, (70 * i) + 30, menuItems[i], true, false);
+			var songText:Alphabet = new Alphabet(0, (70 * id) + 30, menuItems[i].text, true, false);
 			songText.isMenuItem = true;
-			songText.targetY = i;
-			grpMenuShit.add(songText);
+			songText.targetY = id;
+			if (menuItems[i].callback != null) {
+				callBacks.push(menuItems[i].callback);
+				grpMenuShit.add(songText);
+				id++;
+			}
 		}
 
 		changeSelection(0, true);
 	}
 
-	override function update(elapsed:Float)
-	{
+	override function update(elapsed:Float) {
 		if (pauseMusic.volume < 0.5) pauseMusic.volume += 0.01 * elapsed;
-
 		super.update(elapsed);
 
 		var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
 		var upP = controls.UP_P;
 		var downP = controls.DOWN_P;
-		var leftP = controls.LEFT_P;
-		var rightP = controls.RIGHT_P;
+		// disabling this until i find a solution
+		// var leftP = controls.LEFT_P;
+		// var rightP = controls.RIGHT_P;
+		var leftP = false;
+		var rightP = false;
 		if (gamepad != null && backend.KeyBinds.gamepad) {
-			upP = gamepad.justPressed.DPAD_UP;
-			downP = gamepad.justPressed.DPAD_DOWN;
-			leftP = gamepad.justPressed.DPAD_LEFT;
-			rightP = gamepad.justPressed.DPAD_RIGHT;
+			upP = controls.UP_P || gamepad.justPressed.DPAD_UP;
+			downP = controls.DOWN_P || gamepad.justPressed.DPAD_DOWN;
+			// leftP = controls.LEFT_P || gamepad.justPressed.DPAD_LEFT;
+			// rightP = controls.RIGHT_P || gamepad.justPressed.DPAD_RIGHT;
 		}
 		var accepted = controls.ACCEPT;
 		var oldOffset:Float = 0;
@@ -100,22 +114,21 @@ class PauseSubState extends ui.MusicBeatSubstate {
 			oldOffset = PlayState.songOffset;
 			PlayState.songOffset += leftP? -1 : 1;
 			// pre lowercasing the song name (not on update)
-			var songLowercase = StringTools.replace(PlayState.SONG.song, ' ', '-').toLowerCase();
-			var songPath = 'assets/data/songs/' + songLowercase + '/';
+			var songPath = 'assets/data/songs/' + StringTools.replace(PlayState.SONG.song, ' ', '-').toLowerCase() + '/';
 
 			sys.FileSystem.rename(songPath + oldOffset + '.offset', songPath + PlayState.songOffset + '.offset');
 			perSongOffset.text = 'Additive Offset (Left, Right): ' + PlayState.songOffset + ' - Description - ' + 'Adds value to global offset, per song.';
 
 			// Prevent loop from happening every single time the offset changes
 			if (!offsetChanged) {
-				grpMenuShit.clear();
-				menuItems = ['Restart Song', 'Exit to menu'];
-
-				for (i in 0...menuItems.length) {
-					var songText:Alphabet = new Alphabet(0, (70 * i) + 30, menuItems[i], true, false);
-					songText.isMenuItem = true;
-					songText.targetY = i;
-					grpMenuShit.add(songText);
+				var offsetter = 0;
+				for (a => item in grpMenuShit.members) {
+					if (item.text == 'Resume') {
+						offsetter = a + 1;
+						grpMenuShit.remove(item, true);
+						callBacks.remove(callBacks[a]);
+					}
+					else item.targetY -= offsetter;
 				}
 
 				changeSelection(0, true);
@@ -124,17 +137,7 @@ class PauseSubState extends ui.MusicBeatSubstate {
 		}
 		#end
 
-		if (accepted) {
-			switch (menuItems[curSelected]) {
-				case 'Resume':
-					close();
-				case 'Restart Song':
-					FlxG.resetState();
-				case 'Exit to menu':
-					if (FlxG.save.data.fpsCap > 290) (cast (Lib.current.getChildAt(0), Main)).setFPSCap(290);
-					FlxG.switchState(new states.MainMenuState());
-			}
-		}
+		if (accepted && callBacks[curSelected] != null) callBacks[curSelected]();
 	}
 
 	override function destroy() {
@@ -142,9 +145,25 @@ class PauseSubState extends ui.MusicBeatSubstate {
 		super.destroy();
 	}
 
+	function toState(nextState:flixel.util.typeLimit.NextState) {
+		if (FlxG.save.data.fpsCap > 290) (cast (openfl.Lib.current.getChildAt(0), Main)).setFPSCap(290);
+		FlxG.switchState(nextState);
+	}
+
+	public function exitToMainMenu() {
+		if (PlayState.isStoryMode) toState(new states.MainMenuState());
+		else toState(new states.FreeplayState());
+	}
+
+	public function goToOptions() {
+		states.OptionsMenu.fromPlayState = true;
+		toState(new states.OptionsMenu());
+	}
+
 	function changeSelection(change:Int = 0, force:Bool):Void {
 		if (change == 0 && !force) return;
-		curSelected = flixel.math.FlxMath.wrap(curSelected + change, 0, menuItems.length - 1);
+		if (!force) FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+		curSelected = flixel.math.FlxMath.wrap(curSelected + change, 0, grpMenuShit.length - 1);
 
 		for (a => item in grpMenuShit.members) {
 			item.targetY = a - curSelected;

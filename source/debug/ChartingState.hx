@@ -496,6 +496,7 @@ class ChartingState extends flixel.addons.ui.FlxUIState {
 
 				PlayState.SONG = _song;
 				PlayState.curDifficulty = backend.Defaults.difficultyArray.indexOf(curDifficulty);
+				PlayState.inChartingState = true;
 				FlxG.sound.music.stop();
 				vocals.stop();
 				states.LoadingState.loadAndSwitchState(new PlayState());

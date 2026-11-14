@@ -21,6 +21,7 @@ import ui.Alphabet;
 class OptionsMenu extends ui.MusicBeatState
 {
 	public static var instance:OptionsMenu;
+	public static var fromPlayState:Bool = false;
 
 	var selector:FlxText;
 	var curSelected:Int = 0;
@@ -119,8 +120,13 @@ class OptionsMenu extends ui.MusicBeatState
 
 		if (acceptInput)
 		{
-			if (controls.BACK && !isCat)
-				FlxG.switchState(new MainMenuState());
+			if (controls.BACK && !isCat) {
+				if (OptionsMenu.fromPlayState) {
+					OptionsMenu.fromPlayState = false;
+					FlxG.switchState(new play.PlayState());
+				}
+				else FlxG.switchState(new MainMenuState());
+			}
 			else if (controls.BACK)
 			{
 				isCat = false;

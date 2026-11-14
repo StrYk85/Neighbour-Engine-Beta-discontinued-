@@ -45,6 +45,7 @@ class PlayState extends ui.MusicBeatState {
 
 	public static var SONG:SwagSong;
 	public static var isStoryMode:Bool = false;
+	public static var inChartingState:Bool = false;
 	public static var storyWeek:Int = 0;
 	public static var storyPlaylist:Array<String> = [];
 	public static var curDifficulty:Int = 1;
@@ -760,5 +761,10 @@ class PlayState extends ui.MusicBeatState {
 		if (gf != null && curBeat % gfSpeed == 0) gf.dance();
 		if (player != null && !player.isSinging()) player.dance();
 		healthBar.bopIcons();
+	}
+
+	override function destroy() {
+		instance = null;
+		super.destroy();
 	}
 }

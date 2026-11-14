@@ -7,7 +7,7 @@ import openfl.Lib;
 import backend.Controls.Control;
 import flash.text.TextField;
 import flixel.FlxG;
-import flixel.FlxSprite;
+import graphics.FunkinSprite;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.input.keyboard.FlxKey;
@@ -25,10 +25,10 @@ class DebugMenu extends ui.MusicBeatState
 	public var acceptInput:Bool = true;
 	private var grpControls:FlxTypedGroup<Alphabet>;
 	public static var versionShit:FlxText;
-
-	var blackBorder:FlxSprite;
+	
 	override function create() {
-		var menuBG:FlxSprite = new FlxSprite().loadGraphic(Paths.image("menuDesat"));
+		var menuBG:FunkinSprite = new FunkinSprite();
+		menuBG.loadGraphic(Paths.image('mainmenu/menuDesat'));
 
 		menuBG.color = 0xFFea71fd;
 		menuBG.setGraphicSize(Std.int(menuBG.width * 1.1));
@@ -52,7 +52,8 @@ class DebugMenu extends ui.MusicBeatState
 		versionShit.scrollFactor.set();
 		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		
-		blackBorder = new FlxSprite(-30,FlxG.height + 40).makeGraphic((Std.int(FlxG.width * 1.1)),Std.int(versionShit.height + 600),FlxColor.BLACK);
+		var blackBorder = new FunkinSprite(-30, FlxG.height + 40);
+		blackBorder.makeSolid((Std.int(FlxG.width * 1.1)),Std.int(versionShit.height + 600),FlxColor.BLACK);
 		blackBorder.alpha = 0.5;
 
 		add(blackBorder);
